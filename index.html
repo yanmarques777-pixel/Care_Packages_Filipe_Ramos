@@ -456,13 +456,14 @@
 
 <script>
 // ============================================================
-// CONFIGURAÇÃO LOCAL
+// CONFIGURAÇÃO LOCAL (AVIF com fallback JPG)
 // ============================================================
 const LOCAL_DATA_URL = 'assets/Care_Packages.txt';
 const IMAGES_BASE_PATH = 'assets/images/';
+// Ordem de preferência: AVIF, depois JPG
+const IMAGE_EXTENSIONS = ['avif', 'jpg'];
 
 // Mapeamento de nomes de jogo para nomes de arquivo de imagem (sem extensão)
-// Baseado na lista fornecida dos arquivos .jpg disponíveis
 const IMAGE_FILENAME_MAP = {
   "Need for Speed Most Wanted": "need-for-speed-most-wanted",
   "Bloodborne": "bloodborne",
@@ -492,28 +493,48 @@ const IMAGE_FILENAME_MAP = {
   "RE4 Remake": "re4-remake"
 };
 
-// Função para normalizar e tentar encontrar imagem
-function getGameImagePath(gameName) {
-  // Tenta busca exata no mapa
+// Função para normalizar e tentar encontrar o nome base da imagem (sem extensão)
+function getImageBaseFilename(gameName) {
+  // Busca exata
   for (const [key, filename] of Object.entries(IMAGE_FILENAME_MAP)) {
     if (gameName.toLowerCase() === key.toLowerCase()) {
-      return `${IMAGES_BASE_PATH}${filename}.jpg`;
+      return filename;
     }
   }
-  // Tenta busca parcial (ex: "Resident Evil 5" vs "Resident Evil 5")
+  // Busca parcial (se algum nome do mapa estiver contido no nome do jogo)
   for (const [key, filename] of Object.entries(IMAGE_FILENAME_MAP)) {
     if (gameName.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(gameName.toLowerCase())) {
-      return `${IMAGES_BASE_PATH}${filename}.jpg`;
+      return filename;
     }
   }
-  // Fallback: gera slug a partir do nome (ex: "Dark Souls" -> "dark-souls")
-  const slug = gameName.toLowerCase()
+  // Fallback: gera slug a partir do nome
+  return gameName.toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^\w\s-]/g, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '');
-  return `${IMAGES_BASE_PATH}${slug}.jpg`;
+}
+
+// Retorna HTML <picture> com as fontes nas extensões definidas
+function getPictureHtml(gameName, emoji, lazy = true) {
+  const baseFilename = getImageBaseFilename(gameName);
+  const sourcesHtml = IMAGE_EXTENSIONS.map(ext => {
+    const mime = ext === 'avif' ? 'image/avif' : 'image/jpeg';
+    return `<source srcset="${IMAGES_BASE_PATH}${baseFilename}.${ext}" type="${mime}">`;
+  }).join('');
+  
+  // A última extensão (JPG) é usada como fallback no src do img
+  const lastExt = IMAGE_EXTENSIONS[IMAGE_EXTENSIONS.length - 1];
+  const fallbackSrc = `${IMAGES_BASE_PATH}${baseFilename}.${lastExt}`;
+  
+  return `
+    <picture>
+      ${sourcesHtml}
+      <img class="card-image" src="${fallbackSrc}" alt="${gameName}" loading="${lazy ? 'lazy' : 'eager'}"
+           onerror="this.onerror=null; this.parentNode.parentNode.innerHTML='<div class=\\'img-placeholder\\'>${emoji}</div>';">
+    </picture>
+  `;
 }
 
 // Emojis temáticos para fallback
@@ -535,7 +556,7 @@ function getGameEmoji(game) {
 }
 
 // ============================================================
-// PARSER DO TXT (mesma lógica original)
+// PARSER DO TXT (baseado no original)
 // ============================================================
 function parseTxt(txt) {
   const lines = txt.split('\n');
@@ -552,7 +573,6 @@ function parseTxt(txt) {
       continue;
     }
 
-    // Top-level entry (starts with "- " and not indented)
     if (/^- /.test(trimmed) && !raw.startsWith('  ') && !raw.startsWith('\t')) {
       const rest = trimmed.slice(2);
       const urlMatch = rest.match(/^(.+?):\s*(https?:\/\/\S+)(.*)$/);
@@ -607,7 +627,6 @@ function classifyLabel(label) {
   else if (l.includes('lista de mods')) type = 'list';
   else if (l.includes('pack') || l.includes('mod')) type = 'modpack';
 
-  // Extract game name
   const patterns = [
     /infográfico do (.+)/i,
     /infografico do (.+)/i,
@@ -630,7 +649,6 @@ function classifyLabel(label) {
     if (m) { game = m[1].trim().replace(/[()]/g, '').trim(); break; }
   }
 
-  // Normalize game names
   game = game
     .replace(/\bNFVS\b/i, 'NFS')
     .replace(/^Need for Speed Most Wanted$/i, 'Need for Speed Most Wanted')
@@ -686,15 +704,19 @@ function getLinkIcon(label) {
 let allCards = [];
 let currentFilter = 'all';
 
+function escapeHtml(str) {
+  return str.replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
+  });
+}
+
 function buildCard(entry, idx) {
-  const imgPath = getGameImagePath(entry.game);
   const emoji = getGameEmoji(entry.game);
   const mainType = entry.links[0]?.type || entry.type || 'modpack';
-
-  const imageHtml = `
-    <img class="card-image" src="${imgPath}" alt="${entry.game}" 
-         onerror="this.onerror=null; this.parentNode.innerHTML='<div class=\\'img-placeholder\\'>${emoji}</div>';">
-  `;
+  const imageHtml = getPictureHtml(entry.game, emoji, true);
 
   const linksHtml = entry.links.map(link => `
     <a class="dl-btn" href="${link.url}" target="_blank" rel="noopener">
@@ -705,7 +727,7 @@ function buildCard(entry, idx) {
   `).join('');
 
   const noteHtml = entry.note
-    ? `<p class="card-note">${entry.note.slice(0, 120)}${entry.note.length > 120 ? '…' : ''}</p>`
+    ? `<p class="card-note">${escapeHtml(entry.note.slice(0, 120))}${entry.note.length > 120 ? '…' : ''}</p>`
     : '';
 
   return `
@@ -721,16 +743,6 @@ function buildCard(entry, idx) {
       </div>
     </div>
   `;
-}
-
-// Função simples para evitar XSS
-function escapeHtml(str) {
-  return str.replace(/[&<>]/g, function(m) {
-    if (m === '&') return '&amp;';
-    if (m === '<') return '&lt;';
-    if (m === '>') return '&gt;';
-    return m;
-  });
 }
 
 function renderGrid(games) {
@@ -769,14 +781,9 @@ async function loadData() {
   try {
     const response = await fetch(LOCAL_DATA_URL);
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: Não foi possível carregar ${LOCAL_DATA_URL}`);
+      throw new Error(`HTTP ${response.status}: ${LOCAL_DATA_URL} não encontrado`);
     }
     const txt = await response.text();
-    
-    // Validação básica: se não contém links do drive, avisa mas continua
-    if (!txt.includes('drive.google.com') && !txt.includes('nexusmods.com')) {
-      console.warn('O arquivo parece não conter links de download válidos.');
-    }
     
     const { games, ps } = parseTxt(txt);
     
@@ -796,7 +803,7 @@ async function loadData() {
     renderGrid(merged);
     
   } catch (error) {
-    console.error('Erro ao carregar dados locais:', error);
+    console.error(error);
     loadingDiv.style.display = 'none';
     gridDiv.style.display = 'grid';
     gridDiv.innerHTML = `<div class="empty error-state">
@@ -820,7 +827,6 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
 
 document.getElementById('search').addEventListener('input', applyFilters);
 
-// Inicia o carregamento
 loadData();
 </script>
 </body>
