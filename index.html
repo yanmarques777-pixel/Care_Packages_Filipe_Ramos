@@ -6,6 +6,7 @@
 <title>Care Packages — Filipe Ramos</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
+  /* ========== ESTILOS (idênticos ao original) ========== */
   :root {
     --bg: #0a0a0c;
     --surface: #111116;
@@ -17,9 +18,7 @@
     --muted: #6b6b80;
     --card-hover: #1c1c26;
   }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   body {
     background: var(--bg);
     color: var(--text);
@@ -27,8 +26,6 @@
     min-height: 100vh;
     cursor: crosshair;
   }
-
-  /* Grain overlay */
   body::before {
     content: '';
     position: fixed;
@@ -38,15 +35,12 @@
     pointer-events: none;
     z-index: 9999;
   }
-
-  /* Header */
   header {
     padding: 60px 40px 40px;
     border-bottom: 1px solid var(--border);
     position: relative;
     overflow: hidden;
   }
-
   header::after {
     content: 'CARE\APKG';
     white-space: pre;
@@ -60,7 +54,6 @@
     pointer-events: none;
     letter-spacing: -5px;
   }
-
   .header-tag {
     font-size: 11px;
     letter-spacing: 4px;
@@ -78,7 +71,6 @@
     height: 1px;
     background: var(--accent);
   }
-
   h1 {
     font-family: 'Bebas Neue', sans-serif;
     font-size: clamp(56px, 8vw, 110px);
@@ -86,11 +78,7 @@
     letter-spacing: -2px;
     color: var(--text);
   }
-
-  h1 span {
-    color: var(--accent);
-  }
-
+  h1 span { color: var(--accent); }
   .header-meta {
     margin-top: 24px;
     display: flex;
@@ -99,7 +87,6 @@
     font-size: 12px;
     color: var(--muted);
   }
-
   .status-dot {
     width: 7px;
     height: 7px;
@@ -108,13 +95,10 @@
     animation: pulse 2s infinite;
     display: inline-block;
   }
-
   @keyframes pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.4; transform: scale(0.7); }
   }
-
-  /* Controls */
   .controls {
     padding: 24px 40px;
     border-bottom: 1px solid var(--border);
@@ -123,7 +107,6 @@
     align-items: center;
     flex-wrap: wrap;
   }
-
   .filter-label {
     font-size: 11px;
     letter-spacing: 3px;
@@ -131,7 +114,6 @@
     text-transform: uppercase;
     margin-right: 4px;
   }
-
   .filter-btn {
     background: transparent;
     border: 1px solid var(--border);
@@ -144,18 +126,15 @@
     transition: all 0.2s;
     text-transform: uppercase;
   }
-
   .filter-btn:hover, .filter-btn.active {
     border-color: var(--accent);
     color: var(--accent);
     background: rgba(232,255,71,0.05);
   }
-
   .search-wrap {
     margin-left: auto;
     position: relative;
   }
-
   .search-wrap input {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -167,11 +146,7 @@
     outline: none;
     transition: border-color 0.2s;
   }
-
-  .search-wrap input:focus {
-    border-color: var(--accent);
-  }
-
+  .search-wrap input:focus { border-color: var(--accent); }
   .search-wrap::before {
     content: '⌕';
     position: absolute;
@@ -181,8 +156,6 @@
     color: var(--muted);
     font-size: 16px;
   }
-
-  /* Grid */
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
@@ -190,8 +163,6 @@
     background: var(--border);
     border-top: 1px solid var(--border);
   }
-
-  /* Card */
   .card {
     background: var(--surface);
     display: flex;
@@ -199,16 +170,11 @@
     transition: background 0.2s;
     animation: fadeUp 0.4s ease both;
   }
-
-  .card:hover {
-    background: var(--card-hover);
-  }
-
+  .card:hover { background: var(--card-hover); }
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(12px); }
     to { opacity: 1; transform: translateY(0); }
   }
-
   .card-image {
     width: 100%;
     height: 180px;
@@ -217,18 +183,12 @@
     filter: grayscale(20%) brightness(0.85);
     transition: filter 0.3s;
     background: var(--surface2);
-    position: relative;
   }
-
-  .card:hover .card-image {
-    filter: grayscale(0%) brightness(1);
-  }
-
+  .card:hover .card-image { filter: grayscale(0%) brightness(1); }
   .card-image-wrap {
     position: relative;
     overflow: hidden;
   }
-
   .card-image-wrap::after {
     content: '';
     position: absolute;
@@ -236,7 +196,6 @@
     background: linear-gradient(to bottom, transparent 40%, rgba(10,10,12,0.8));
     pointer-events: none;
   }
-
   .card-type-badge {
     position: absolute;
     top: 12px;
@@ -250,20 +209,17 @@
     font-family: 'DM Mono', monospace;
     z-index: 2;
   }
-
   .card-type-badge.infographic { background: #4a90d9; }
   .card-type-badge.modpack { background: var(--accent2); }
   .card-type-badge.retexture { background: #9b59b6; }
   .card-type-badge.map { background: #27ae60; }
   .card-type-badge.list { background: #e67e22; }
-
   .card-body {
     padding: 20px;
     flex: 1;
     display: flex;
     flex-direction: column;
   }
-
   .card-game {
     font-family: 'Syne', sans-serif;
     font-size: 18px;
@@ -272,7 +228,6 @@
     margin-bottom: 6px;
     line-height: 1.2;
   }
-
   .card-note {
     font-size: 11px;
     color: var(--muted);
@@ -281,13 +236,7 @@
     flex: 1;
     font-style: italic;
   }
-
-  .card-links {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
+  .card-links { display: flex; flex-direction: column; gap: 6px; }
   .dl-btn {
     display: flex;
     align-items: center;
@@ -303,40 +252,16 @@
     transition: all 0.15s;
     cursor: pointer;
   }
-
   .dl-btn:hover {
     border-color: var(--accent);
     color: var(--accent);
     background: rgba(232,255,71,0.06);
   }
-
-  .dl-btn .icon {
-    opacity: 0.5;
-    font-size: 13px;
-    flex-shrink: 0;
-  }
-
+  .dl-btn .icon { opacity: 0.5; font-size: 13px; flex-shrink: 0; }
   .dl-btn:hover .icon { opacity: 1; }
-
-  .dl-btn .label {
-    flex: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .dl-btn .arrow {
-    opacity: 0;
-    transition: opacity 0.15s, transform 0.15s;
-    font-size: 12px;
-  }
-
-  .dl-btn:hover .arrow {
-    opacity: 1;
-    transform: translateX(3px);
-  }
-
-  /* Empty state */
+  .dl-btn .label { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dl-btn .arrow { opacity: 0; transition: opacity 0.15s, transform 0.15s; font-size: 12px; }
+  .dl-btn:hover .arrow { opacity: 1; transform: translateX(3px); }
   .empty, .error-state {
     grid-column: 1 / -1;
     padding: 80px;
@@ -346,12 +271,7 @@
     letter-spacing: 2px;
     text-transform: uppercase;
   }
-
-  .error-state {
-    color: #ff6b6b;
-  }
-
-  /* Footer */
+  .error-state { color: #ff6b6b; }
   footer {
     padding: 32px 40px;
     border-top: 1px solid var(--border);
@@ -362,14 +282,7 @@
     color: var(--muted);
     letter-spacing: 1px;
   }
-
-  .footer-ps {
-    max-width: 500px;
-    line-height: 1.7;
-    font-style: italic;
-  }
-
-  /* Loading */
+  .footer-ps { max-width: 500px; line-height: 1.7; font-style: italic; }
   #loading {
     padding: 100px 40px;
     text-align: center;
@@ -382,7 +295,6 @@
     align-items: center;
     gap: 20px;
   }
-
   .loader {
     width: 32px;
     height: 32px;
@@ -391,11 +303,7 @@
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-
+  @keyframes spin { to { transform: rotate(360deg); } }
   .count-badge {
     background: rgba(232,255,71,0.12);
     color: var(--accent);
@@ -403,8 +311,6 @@
     padding: 2px 8px;
     letter-spacing: 2px;
   }
-
-  /* Image placeholder */
   .img-placeholder {
     width: 100%;
     height: 180px;
@@ -420,11 +326,11 @@
 <body>
 
 <header>
-  <div class="header-tag">by Filipe Ramos · Atualizado automaticamente</div>
+  <div class="header-tag">by Filipe Ramos · Google Sheets sync</div>
   <h1>CARE<br><span>PACKAGES</span></h1>
   <div class="header-meta">
     <span class="status-dot"></span>
-    <span>Sincronizado com arquivo local</span>
+    <span>Dados via Google Sheets</span>
     <span id="item-count" class="count-badge">—</span>
   </div>
 </header>
@@ -450,20 +356,21 @@
 <div class="grid" id="grid" style="display:none"></div>
 
 <footer>
-  <div class="footer-ps" id="footer-ps"></div>
+  <div class="footer-ps" id="footer-ps">Dados sincronizados via Google Sheets — edite a planilha e publique novamente.</div>
   <div>care-packages.html</div>
 </footer>
 
 <script>
 // ============================================================
-// CONFIGURAÇÃO LOCAL (AVIF com fallback JPG)
+// CONFIGURAÇÃO - SUBSTITUA PELA SUA URL DO GOOGLE SHEETS CSV
 // ============================================================
-const LOCAL_DATA_URL = 'assets/Care_Packages.txt';
+const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnzg_Kx3G6lfQsUzCaGv2r-sA-quEirYw4YFgNF-Y5ibgYwcVM3Cb9XywtNrVgK9G9C3RThSoMmJUf/pub?output=csv';  // 👈 COLE O LINK AQUI
+
+// Caminho das imagens (locais)
 const IMAGES_BASE_PATH = 'assets/images/';
-// Ordem de preferência: AVIF, depois JPG
 const IMAGE_EXTENSIONS = ['avif', 'jpg'];
 
-// Mapeamento de nomes de jogo para nomes de arquivo de imagem (sem extensão)
+// Mapeamento opcional de nomes de jogos para slugs de imagem (mesmo do TXT)
 const IMAGE_FILENAME_MAP = {
   "Need for Speed Most Wanted": "need-for-speed-most-wanted",
   "Bloodborne": "bloodborne",
@@ -493,21 +400,14 @@ const IMAGE_FILENAME_MAP = {
   "RE4 Remake": "re4-remake"
 };
 
-// Função para normalizar e tentar encontrar o nome base da imagem (sem extensão)
+// ========== FUNÇÕES AUXILIARES ==========
 function getImageBaseFilename(gameName) {
-  // Busca exata
   for (const [key, filename] of Object.entries(IMAGE_FILENAME_MAP)) {
-    if (gameName.toLowerCase() === key.toLowerCase()) {
-      return filename;
-    }
+    if (gameName.toLowerCase() === key.toLowerCase()) return filename;
   }
-  // Busca parcial (se algum nome do mapa estiver contido no nome do jogo)
   for (const [key, filename] of Object.entries(IMAGE_FILENAME_MAP)) {
-    if (gameName.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(gameName.toLowerCase())) {
-      return filename;
-    }
+    if (gameName.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(gameName.toLowerCase())) return filename;
   }
-  // Fallback: gera slug a partir do nome
   return gameName.toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^\w\s-]/g, '')
@@ -516,28 +416,22 @@ function getImageBaseFilename(gameName) {
     .replace(/^-|-$/g, '');
 }
 
-// Retorna HTML <picture> com as fontes nas extensões definidas
-function getPictureHtml(gameName, emoji, lazy = true) {
+function getPictureHtml(gameName, emoji) {
   const baseFilename = getImageBaseFilename(gameName);
   const sourcesHtml = IMAGE_EXTENSIONS.map(ext => {
     const mime = ext === 'avif' ? 'image/avif' : 'image/jpeg';
     return `<source srcset="${IMAGES_BASE_PATH}${baseFilename}.${ext}" type="${mime}">`;
   }).join('');
-  
-  // A última extensão (JPG) é usada como fallback no src do img
-  const lastExt = IMAGE_EXTENSIONS[IMAGE_EXTENSIONS.length - 1];
-  const fallbackSrc = `${IMAGES_BASE_PATH}${baseFilename}.${lastExt}`;
-  
+  const fallbackSrc = `${IMAGES_BASE_PATH}${baseFilename}.${IMAGE_EXTENSIONS[IMAGE_EXTENSIONS.length-1]}`;
   return `
     <picture>
       ${sourcesHtml}
-      <img class="card-image" src="${fallbackSrc}" alt="${gameName}" loading="${lazy ? 'lazy' : 'eager'}"
+      <img class="card-image" src="${fallbackSrc}" alt="${gameName}" loading="lazy"
            onerror="this.onerror=null; this.parentNode.parentNode.innerHTML='<div class=\\'img-placeholder\\'>${emoji}</div>';">
     </picture>
   `;
 }
 
-// Emojis temáticos para fallback
 function getGameEmoji(game) {
   const l = game.toLowerCase();
   if (l.includes('need for speed') || l.includes('gran turismo') || l.includes('nfs')) return '🏎️';
@@ -555,130 +449,6 @@ function getGameEmoji(game) {
   return '🎮';
 }
 
-// ============================================================
-// PARSER DO TXT (baseado no original)
-// ============================================================
-function parseTxt(txt) {
-  const lines = txt.split('\n');
-  const games = [];
-  let current = null;
-  let psLine = '';
-
-  for (let i = 0; i < lines.length; i++) {
-    const raw = lines[i];
-    const trimmed = raw.trim();
-
-    if (trimmed.startsWith('PS:')) {
-      psLine = trimmed;
-      continue;
-    }
-
-    if (/^- /.test(trimmed) && !raw.startsWith('  ') && !raw.startsWith('\t')) {
-      const rest = trimmed.slice(2);
-      const urlMatch = rest.match(/^(.+?):\s*(https?:\/\/\S+)(.*)$/);
-      const noUrlMatch = rest.match(/^(.+?)(?::)?$/);
-
-      if (urlMatch) {
-        const label = urlMatch[1].trim();
-        const url = urlMatch[2].trim();
-        const note = urlMatch[3].trim();
-        const { game, type } = classifyLabel(label);
-        const existing = games.find(g => g.game === game);
-        if (existing) {
-          existing.links.push({ label: getShortLabel(label, type), url, type });
-          if (note) existing.note = (existing.note ? existing.note + ' ' : '') + note;
-        } else {
-          current = { game, type: getMainType(type, label), links: [{ label: getShortLabel(label, type), url, type }], note: note || '' };
-          games.push(current);
-        }
-      } else if (noUrlMatch) {
-        const label = rest.replace(/:$/, '').trim();
-        const { game } = classifyLabel(label);
-        current = { game, type: 'modpack', links: [], note: '' };
-        games.push(current);
-      }
-    } else if (/^\s{2,}/.test(raw) && trimmed.startsWith('- ')) {
-      const rest = trimmed.slice(2);
-      const urlMatch = rest.match(/^(.+?):\s*(https?:\/\/\S+)(.*)$/);
-      if (urlMatch && current) {
-        const sublabel = urlMatch[1].trim();
-        const url = urlMatch[2].trim();
-        const { type } = classifyLabel(sublabel);
-        current.links.push({ label: sublabel, url, type });
-      }
-    } else if (/^\s{2,}/.test(raw) && trimmed && current && !trimmed.startsWith('-')) {
-      if (current && !trimmed.startsWith('http')) {
-        current.note = (current.note ? current.note + ' ' : '') + trimmed;
-      }
-    }
-  }
-
-  return { games, ps: psLine };
-}
-
-function classifyLabel(label) {
-  const l = label.toLowerCase();
-  let type = 'modpack';
-  let game = label;
-
-  if (l.includes('infográfico') || l.includes('infografico') || l.includes('tabela')) type = 'infographic';
-  else if (l.includes('retextura') || l.includes('retexture')) type = 'retexture';
-  else if (l.includes('mapa') || l.includes('.psd')) type = 'map';
-  else if (l.includes('lista de mods')) type = 'list';
-  else if (l.includes('pack') || l.includes('mod')) type = 'modpack';
-
-  const patterns = [
-    /infográfico do (.+)/i,
-    /infografico do (.+)/i,
-    /tabela de armas do (.+)/i,
-    /retextura do (.+)/i,
-    /pack de retextura do (.+)/i,
-    /pack de mods (?:do |configurados do |usados no )(.+)/i,
-    /pack (?:com|de) (.+)/i,
-    /lista de mods (?:baixados e alterações feitas do |do )(.+)/i,
-    /mod pack do (.+)/i,
-    /mod de rebalanceamento (?:de drops do |do )(.+)/i,
-    /care package do (.+)/i,
-    /mapa (.+?) \d/i,
-    /mapa (.+)/i,
-    /(.+) modificado/i,
-  ];
-
-  for (const p of patterns) {
-    const m = label.match(p);
-    if (m) { game = m[1].trim().replace(/[()]/g, '').trim(); break; }
-  }
-
-  game = game
-    .replace(/\bNFVS\b/i, 'NFS')
-    .replace(/^Need for Speed Most Wanted$/i, 'Need for Speed Most Wanted')
-    .replace(/^NFS 2015$/i, 'NFS 2015')
-    .replace(/\bRE5\b/i, 'Resident Evil 5')
-    .replace(/\bRE Revelations 2\b/i, 'RE Revelations 2')
-    .replace(/\bGTA IV\b/i, 'GTA IV')
-    .replace(/\bGTA SA\b/i, 'GTA SA')
-    .replace(/\bFFXII\b/i, 'Final Fantasy XII')
-    .replace(/^S\.T\.A\.L\.K\.E\.R Call of (.+)/i, 'S.T.A.L.K.E.R $1')
-    .replace(/Yu-Gi-Oh!/i, 'Yu-Gi-Oh!')
-    .replace(/Monster Hunter - World/i, 'Monster Hunter World');
-
-  return { game, type };
-}
-
-function getMainType(type, label) {
-  const l = label.toLowerCase();
-  if (l.includes('mapa') || (l.includes('bloodborne') && l.includes('mapa'))) return 'map';
-  return type;
-}
-
-function getShortLabel(label, type) {
-  const clean = label
-    .replace(/^(?:pack de mods (?:do|usados no|configurados do)|mod pack do|retextura do|pack de retextura do|lista de mods (?:baixados e alterações feitas do|do)|mod de rebalanceamento (?:de drops do|do)|care package do|infográfico do|tabela de armas do|mapa)\s+/i, '')
-    .trim();
-  if (clean === label) return label;
-  return clean;
-}
-
 function getTypeLabel(type) {
   const map = { modpack: 'Modpack', retexture: 'Retextura', infographic: 'Infográfico', map: 'Mapa', list: 'Lista' };
   return map[type] || 'Pack';
@@ -690,19 +460,12 @@ function getLinkIcon(label) {
   if (l.includes('retextura') || l.includes('textur')) return '🎨';
   if (l.includes('infográfico') || l.includes('infografico') || l.includes('tabela')) return '📊';
   if (l.includes('cheat')) return '🎯';
-  if (l.includes('ptbr') || l.includes('pt)')) return '🇧🇷';
-  if (l.includes('eng') || l.includes('inglês') || l.includes('inglés')) return '🇺🇸';
+  if (l.includes('ptbr')) return '🇧🇷';
+  if (l.includes('eng')) return '🇺🇸';
   if (l.includes('mapa') || l.includes('.psd')) return '🗺️';
-  if (l.includes('upgrade')) return '⬆️';
   if (l.includes('lista')) return '📋';
   return '⬇️';
 }
-
-// ============================================================
-// RENDERIZAÇÃO
-// ============================================================
-let allCards = [];
-let currentFilter = 'all';
 
 function escapeHtml(str) {
   return str.replace(/[&<>]/g, function(m) {
@@ -713,11 +476,68 @@ function escapeHtml(str) {
   });
 }
 
+// ========== PROCESSAR CSV ==========
+async function fetchSheetData() {
+  const response = await fetch(GOOGLE_SHEETS_CSV_URL);
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const csvText = await response.text();
+  const lines = csvText.split(/\r?\n/);
+  const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+  
+  // Índices esperados: game, type, link_label, link_url, note
+  const idxGame = headers.indexOf('game');
+  const idxType = headers.indexOf('type');
+  const idxLabel = headers.indexOf('link_label');
+  const idxUrl = headers.indexOf('link_url');
+  const idxNote = headers.indexOf('note');
+  
+  if (idxGame === -1 || idxType === -1 || idxLabel === -1 || idxUrl === -1) {
+    throw new Error('Colunas obrigatórias não encontradas: game, type, link_label, link_url');
+  }
+  
+  const gamesMap = new Map(); // key = nome do jogo (lowercase), value = objeto final
+  
+  for (let i = 1; i < lines.length; i++) {
+    if (!lines[i].trim()) continue;
+    // Parse CSV simples (não lida com vírgulas dentro de aspas, mas para seu uso simples é suficiente)
+    const row = lines[i].split(',').map(cell => cell.trim().replace(/^"|"$/g, ''));
+    const game = row[idxGame];
+    if (!game) continue;
+    const type = row[idxType] || 'modpack';
+    const linkLabel = row[idxLabel];
+    const linkUrl = row[idxUrl];
+    const note = row[idxNote] || '';
+    
+    const key = game.toLowerCase();
+    if (!gamesMap.has(key)) {
+      gamesMap.set(key, {
+        game: game,
+        type: type,
+        links: [],
+        note: ''
+      });
+    }
+    const entry = gamesMap.get(key);
+    if (linkLabel && linkUrl) {
+      entry.links.push({ label: linkLabel, url: linkUrl, type: type });
+    }
+    if (note && !entry.note) entry.note = note;
+    else if (note) entry.note += ' ' + note;
+  }
+  
+  // Converter mapa para array
+  return Array.from(gamesMap.values());
+}
+
+// ========== RENDERIZAÇÃO ==========
+let allCards = [];
+let currentFilter = 'all';
+
 function buildCard(entry, idx) {
   const emoji = getGameEmoji(entry.game);
-  const mainType = entry.links[0]?.type || entry.type || 'modpack';
-  const imageHtml = getPictureHtml(entry.game, emoji, true);
-
+  const mainType = entry.links[0]?.type || entry.type;
+  const imageHtml = getPictureHtml(entry.game, emoji);
+  
   const linksHtml = entry.links.map(link => `
     <a class="dl-btn" href="${link.url}" target="_blank" rel="noopener">
       <span class="icon">${getLinkIcon(link.label)}</span>
@@ -725,11 +545,9 @@ function buildCard(entry, idx) {
       <span class="arrow">→</span>
     </a>
   `).join('');
-
-  const noteHtml = entry.note
-    ? `<p class="card-note">${escapeHtml(entry.note.slice(0, 120))}${entry.note.length > 120 ? '…' : ''}</p>`
-    : '';
-
+  
+  const noteHtml = entry.note ? `<p class="card-note">${escapeHtml(entry.note.slice(0, 120))}${entry.note.length > 120 ? '…' : ''}</p>` : '';
+  
   return `
     <div class="card" style="animation-delay:${idx * 40}ms" data-type="${mainType}" data-game="${entry.game.toLowerCase()}">
       <div class="card-image-wrap">
@@ -745,77 +563,44 @@ function buildCard(entry, idx) {
   `;
 }
 
-function renderGrid(games) {
-  allCards = games;
-  applyFilters();
-  document.getElementById('item-count').textContent = `${games.length} games`;
-  document.getElementById('loading').style.display = 'none';
-  document.getElementById('grid').style.display = 'grid';
-}
-
 function applyFilters() {
   const grid = document.getElementById('grid');
   const search = document.getElementById('search').value.toLowerCase();
-
   const filtered = allCards.filter(entry => {
     const typeMatch = currentFilter === 'all' || (entry.links[0]?.type || entry.type) === currentFilter;
     const searchMatch = !search || entry.game.toLowerCase().includes(search);
     return typeMatch && searchMatch;
   });
-
   if (filtered.length === 0) {
     grid.innerHTML = '<div class="empty">Nenhum resultado encontrado</div>';
     return;
   }
-
   grid.innerHTML = filtered.map((e, i) => buildCard(e, i)).join('');
 }
 
-// ============================================================
-// CARREGAMENTO DO ARQUIVO LOCAL
-// ============================================================
+// ========== CARREGAR DADOS ==========
 async function loadData() {
   const loadingDiv = document.getElementById('loading');
   const gridDiv = document.getElementById('grid');
-  
   try {
-    const response = await fetch(LOCAL_DATA_URL);
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${LOCAL_DATA_URL} não encontrado`);
-    }
-    const txt = await response.text();
-    
-    const { games, ps } = parseTxt(txt);
-    
-    // Mescla entradas com mesmo jogo
-    const merged = [];
-    for (const g of games) {
-      const ex = merged.find(m => m.game.toLowerCase() === g.game.toLowerCase());
-      if (ex) {
-        ex.links.push(...g.links);
-        if (g.note) ex.note = (ex.note ? ex.note + ' ' : '') + g.note;
-      } else {
-        merged.push({ ...g });
-      }
-    }
-    
-    if (ps) document.getElementById('footer-ps').textContent = ps;
-    renderGrid(merged);
-    
-  } catch (error) {
-    console.error(error);
+    const games = await fetchSheetData();
+    allCards = games;
+    document.getElementById('item-count').textContent = `${games.length} games`;
+    loadingDiv.style.display = 'none';
+    gridDiv.style.display = 'grid';
+    applyFilters();
+  } catch (err) {
+    console.error(err);
     loadingDiv.style.display = 'none';
     gridDiv.style.display = 'grid';
     gridDiv.innerHTML = `<div class="empty error-state">
-      ⚠️ Erro ao carregar <strong>${LOCAL_DATA_URL}</strong><br>
-      Verifique se o arquivo existe no diretório "assets/" e tente novamente.
+      ⚠️ Erro ao carregar dados do Google Sheets.<br>
+      Verifique se a URL do CSV está correta e se a planilha está publicada.
     </div>`;
   }
 }
 
-// ============================================================
-// EVENTOS E INICIALIZAÇÃO
-// ============================================================
+// ========== EVENTOS ==========
 document.querySelectorAll('.filter-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -824,7 +609,6 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
     applyFilters();
   });
 });
-
 document.getElementById('search').addEventListener('input', applyFilters);
 
 loadData();
