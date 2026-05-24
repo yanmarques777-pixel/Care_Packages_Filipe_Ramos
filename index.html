@@ -6,7 +6,7 @@
 <title>Care Packages — Filipe Ramos</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
-  /* ========== ESTILOS (idênticos ao original) ========== */
+  /* ========== MESMO ESTILO BASE, COM AJUSTES PARA MÚLTIPLAS BADGES ========== */
   :root {
     --bg: #0a0a0c;
     --surface: #111116;
@@ -196,10 +196,18 @@
     background: linear-gradient(to bottom, transparent 40%, rgba(10,10,12,0.8));
     pointer-events: none;
   }
-  .card-type-badge {
+  /* Container de múltiplas badges */
+  .card-badges {
     position: absolute;
     top: 12px;
     right: 12px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    z-index: 2;
+  }
+  .card-type-badge {
     background: var(--accent2);
     color: white;
     font-size: 9px;
@@ -207,7 +215,8 @@
     padding: 3px 8px;
     text-transform: uppercase;
     font-family: 'DM Mono', monospace;
-    z-index: 2;
+    border-radius: 2px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
   }
   .card-type-badge.infographic { background: #4a90d9; }
   .card-type-badge.modpack { background: var(--accent2); }
@@ -362,15 +371,15 @@
 
 <script>
 // ============================================================
-// CONFIGURAÇÃO - SUBSTITUA PELA SUA URL DO GOOGLE SHEETS CSV
+// CONFIGURAÇÃO - URL DO GOOGLE SHEETS CSV (PUBLICADO)
 // ============================================================
-const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnzg_Kx3G6lfQsUzCaGv2r-sA-quEirYw4YFgNF-Y5ibgYwcVM3Cb9XywtNrVgK9G9C3RThSoMmJUf/pub?output=csv';  // 👈 COLE O LINK AQUI
+const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnzg_Kx3G6lfQsUzCaGv2r-sA-quEirYw4YFgNF-Y5ibgYwcVM3Cb9XywtNrVgK9G9C3RThSoMmJUf/pub?output=csv';
 
 // Caminho das imagens (locais)
 const IMAGES_BASE_PATH = 'assets/images/';
 const IMAGE_EXTENSIONS = ['avif', 'jpg'];
 
-// Mapeamento opcional de nomes de jogos para slugs de imagem (mesmo do TXT)
+// Mapeamento de nomes de jogos para slugs de imagem
 const IMAGE_FILENAME_MAP = {
   "Need for Speed Most Wanted": "need-for-speed-most-wanted",
   "Bloodborne": "bloodborne",
@@ -476,7 +485,7 @@ function escapeHtml(str) {
   });
 }
 
-// ========== PROCESSAR CSV ==========
+// ========== PROCESSAR CSV (AGORA SUPORTA MÚLTIPLOS TIPOS POR JOGO) ==========
 async function fetchSheetData() {
   const response = await fetch(GOOGLE_SHEETS_CSV_URL);
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -484,7 +493,6 @@ async function fetchSheetData() {
   const lines = csvText.split(/\r?\n/);
   const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
   
-  // Índices esperados: game, type, link_label, link_url, note
   const idxGame = headers.indexOf('game');
   const idxType = headers.indexOf('type');
   const idxLabel = headers.indexOf('link_label');
@@ -495,15 +503,15 @@ async function fetchSheetData() {
     throw new Error('Colunas obrigatórias não encontradas: game, type, link_label, link_url');
   }
   
-  const gamesMap = new Map(); // key = nome do jogo (lowercase), value = objeto final
+  const gamesMap = new Map(); // key = nome do jogo (lowercase)
   
   for (let i = 1; i < lines.length; i++) {
     if (!lines[i].trim()) continue;
-    // Parse CSV simples (não lida com vírgulas dentro de aspas, mas para seu uso simples é suficiente)
+    // Parse CSV simples (adequado para sua planilha sem vírgulas internas)
     const row = lines[i].split(',').map(cell => cell.trim().replace(/^"|"$/g, ''));
     const game = row[idxGame];
     if (!game) continue;
-    const type = row[idxType] || 'modpack';
+    const type = (row[idxType] || 'modpack').toLowerCase();
     const linkLabel = row[idxLabel];
     const linkUrl = row[idxUrl];
     const note = row[idxNote] || '';
@@ -512,7 +520,7 @@ async function fetchSheetData() {
     if (!gamesMap.has(key)) {
       gamesMap.set(key, {
         game: game,
-        type: type,
+        types: new Set(),      // conjunto de tipos únicos para este jogo
         links: [],
         note: ''
       });
@@ -520,23 +528,31 @@ async function fetchSheetData() {
     const entry = gamesMap.get(key);
     if (linkLabel && linkUrl) {
       entry.links.push({ label: linkLabel, url: linkUrl, type: type });
+      entry.types.add(type);
     }
     if (note && !entry.note) entry.note = note;
     else if (note) entry.note += ' ' + note;
   }
   
-  // Converter mapa para array
-  return Array.from(gamesMap.values());
+  // Converter mapa para array e adicionar campo 'typesArray' para fácil uso
+  return Array.from(gamesMap.values()).map(entry => ({
+    ...entry,
+    typesArray: Array.from(entry.types)
+  }));
 }
 
-// ========== RENDERIZAÇÃO ==========
+// ========== RENDERIZAÇÃO COM MÚLTIPLAS BADGES ==========
 let allCards = [];
 let currentFilter = 'all';
 
 function buildCard(entry, idx) {
   const emoji = getGameEmoji(entry.game);
-  const mainType = entry.links[0]?.type || entry.type;
   const imageHtml = getPictureHtml(entry.game, emoji);
+  
+  // Gera badges para todos os tipos únicos do jogo
+  const badgesHtml = entry.typesArray.map(type => 
+    `<span class="card-type-badge ${type}">${getTypeLabel(type)}</span>`
+  ).join('');
   
   const linksHtml = entry.links.map(link => `
     <a class="dl-btn" href="${link.url}" target="_blank" rel="noopener">
@@ -548,11 +564,12 @@ function buildCard(entry, idx) {
   
   const noteHtml = entry.note ? `<p class="card-note">${escapeHtml(entry.note.slice(0, 120))}${entry.note.length > 120 ? '…' : ''}</p>` : '';
   
+  // Atributo data-types contém os tipos separados por vírgula para facilitar filtro por CSS (opcional)
   return `
-    <div class="card" style="animation-delay:${idx * 40}ms" data-type="${mainType}" data-game="${entry.game.toLowerCase()}">
+    <div class="card" style="animation-delay:${idx * 40}ms" data-types="${entry.typesArray.join(',')}" data-game="${entry.game.toLowerCase()}">
       <div class="card-image-wrap">
         ${imageHtml}
-        <span class="card-type-badge ${mainType}">${getTypeLabel(mainType)}</span>
+        <div class="card-badges">${badgesHtml}</div>
       </div>
       <div class="card-body">
         <div class="card-game">${escapeHtml(entry.game)}</div>
@@ -566,15 +583,19 @@ function buildCard(entry, idx) {
 function applyFilters() {
   const grid = document.getElementById('grid');
   const search = document.getElementById('search').value.toLowerCase();
+  
   const filtered = allCards.filter(entry => {
-    const typeMatch = currentFilter === 'all' || (entry.links[0]?.type || entry.type) === currentFilter;
+    // Filtro por tipo: se "all", passa; senão, verifica se o conjunto de tipos contém o filtro atual
+    const typeMatch = currentFilter === 'all' || entry.typesArray.includes(currentFilter);
     const searchMatch = !search || entry.game.toLowerCase().includes(search);
     return typeMatch && searchMatch;
   });
+  
   if (filtered.length === 0) {
     grid.innerHTML = '<div class="empty">Nenhum resultado encontrado</div>';
     return;
   }
+  
   grid.innerHTML = filtered.map((e, i) => buildCard(e, i)).join('');
 }
 
