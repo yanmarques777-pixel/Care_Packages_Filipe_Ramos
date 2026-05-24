@@ -18,6 +18,8 @@
     --text: #e8e8f0;
     --muted: #6b6b80;
     --card-hover: #1c1c26;
+    --outdated: #c0392b;
+    --outdated-bg: rgba(192, 57, 43, 0.15);
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -261,6 +263,40 @@
   .card-type-badge.retexture { background: #9b59b6; }
   .card-type-badge.map { background: #27ae60; }
   .card-type-badge.list { background: #e67e22; }
+
+  /* BADGE DE DESATUALIZADO (inferior) */
+  .outdated-badge {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    background: rgba(192, 57, 43, 0.85);
+    backdrop-filter: blur(4px);
+    color: white;
+    font-size: 8px;
+    letter-spacing: 2px;
+    padding: 3px 8px;
+    text-transform: uppercase;
+    font-family: 'DM Mono', monospace;
+    border-radius: 2px;
+    z-index: 2;
+    font-weight: bold;
+  }
+
+  /* ESTILO PARA LINKS DESATUALIZADOS */
+  .dl-btn.outdated-link {
+    background: var(--outdated-bg);
+    border-color: rgba(192, 57, 43, 0.3);
+    color: var(--muted);
+  }
+  .dl-btn.outdated-link:hover {
+    border-color: var(--outdated);
+    color: var(--outdated);
+    background: rgba(192, 57, 43, 0.1);
+  }
+  .dl-btn.outdated-link .icon {
+    opacity: 0.6;
+  }
+
   .card-body {
     padding: 20px;
     flex: 1;
@@ -478,21 +514,17 @@ const muteBtn = document.getElementById('muteButton');
 let isMuted = false;
 let introStarted = false;
 
-// Configurar volume
 intro.volume = 0.6;
 ambient.volume = 0.4;
 
-// Quando a intro terminar, toca a ambiente
 intro.addEventListener('ended', () => {
   if (!isMuted) {
     ambient.play().catch(e => console.log('Autoplay bloqueado:', e));
   }
 });
 
-// Botão de mutar/desmutar
 muteBtn.addEventListener('click', () => {
   isMuted = !isMuted;
-  
   if (isMuted) {
     intro.pause();
     ambient.pause();
@@ -509,11 +541,9 @@ muteBtn.addEventListener('click', () => {
   }
 });
 
-// Iniciar música quando o usuário interagir (política de autoplay)
 function startMusic() {
   if (introStarted) return;
   introStarted = true;
-  
   if (!isMuted) {
     intro.play().catch(e => {
       console.log('Autoplay bloqueado, aguardando interação:', e);
@@ -522,7 +552,6 @@ function startMusic() {
   }
 }
 
-// Detecta qualquer clique do usuário para iniciar a música
 document.body.addEventListener('click', startMusic, { once: true });
 window.addEventListener('scroll', startMusic, { once: true });
 window.addEventListener('keydown', startMusic, { once: true });
@@ -582,19 +611,24 @@ function getImageBaseFilename(gameName) {
     .replace(/^-|-$/g, '');
 }
 
-function getPictureHtml(gameName, emoji) {
+function getPictureHtml(gameName, emoji, isOutdated) {
   const baseFilename = getImageBaseFilename(gameName);
   const sourcesHtml = IMAGE_EXTENSIONS.map(ext => {
     const mime = ext === 'avif' ? 'image/avif' : 'image/jpeg';
     return `<source srcset="${IMAGES_BASE_PATH}${baseFilename}.${ext}" type="${mime}">`;
   }).join('');
   const fallbackSrc = `${IMAGES_BASE_PATH}${baseFilename}.${IMAGE_EXTENSIONS[IMAGE_EXTENSIONS.length-1]}`;
+  
+  // Adiciona badge de desatualizado se necessário
+  const outdatedBadgeHtml = isOutdated ? '<div class="outdated-badge">⚠️ DESATUALIZADO</div>' : '';
+  
   return `
     <picture>
       ${sourcesHtml}
       <img class="card-image" src="${fallbackSrc}" alt="${gameName}" loading="lazy"
            onerror="this.onerror=null; this.parentNode.parentNode.innerHTML='<div class=\\'img-placeholder\\'>${emoji}</div>';">
     </picture>
+    ${outdatedBadgeHtml}
   `;
 }
 
@@ -642,7 +676,7 @@ function escapeHtml(str) {
   });
 }
 
-// ========== PROCESSAR CSV ==========
+// ========== PROCESSAR CSV (COM STATUS) ==========
 async function fetchSheetData() {
   const response = await fetch(GOOGLE_SHEETS_CSV_URL);
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -655,6 +689,7 @@ async function fetchSheetData() {
   const idxLabel = headers.indexOf('link_label');
   const idxUrl = headers.indexOf('link_url');
   const idxNote = headers.indexOf('note');
+  const idxStatus = headers.indexOf('status');
   
   if (idxGame === -1 || idxType === -1 || idxLabel === -1 || idxUrl === -1) {
     throw new Error('Colunas obrigatórias não encontradas');
@@ -671,6 +706,7 @@ async function fetchSheetData() {
     const linkLabel = row[idxLabel];
     const linkUrl = row[idxUrl];
     const note = row[idxNote] || '';
+    const status = idxStatus !== -1 ? (row[idxStatus] || 'atualizado').toLowerCase() : 'atualizado';
     
     const key = game.toLowerCase();
     if (!gamesMap.has(key)) {
@@ -678,13 +714,16 @@ async function fetchSheetData() {
         game: game,
         types: new Set(),
         links: [],
-        note: ''
+        note: '',
+        hasOutdated: false
       });
     }
     const entry = gamesMap.get(key);
     if (linkLabel && linkUrl) {
-      entry.links.push({ label: linkLabel, url: linkUrl, type: type });
+      const isOutdated = status === 'desatualizado';
+      entry.links.push({ label: linkLabel, url: linkUrl, type: type, isOutdated: isOutdated });
       entry.types.add(type);
+      if (isOutdated) entry.hasOutdated = true;
     }
     if (note && !entry.note) entry.note = note;
     else if (note) entry.note += ' ' + note;
@@ -702,17 +741,23 @@ let currentFilter = 'all';
 
 function buildCard(entry, idx) {
   const emoji = getGameEmoji(entry.game);
-  const imageHtml = getPictureHtml(entry.game, emoji);
+  const imageHtml = getPictureHtml(entry.game, emoji, entry.hasOutdated);
   const badgesHtml = entry.typesArray.map(type => 
     `<span class="card-type-badge ${type}">${getTypeLabel(type)}</span>`
   ).join('');
-  const linksHtml = entry.links.map(link => `
-    <a class="dl-btn" href="${link.url}" target="_blank" rel="noopener">
-      <span class="icon">${getLinkIcon(link.label)}</span>
-      <span class="label">${link.label.length > 50 ? link.label.slice(0, 48) + '…' : link.label}</span>
-      <span class="arrow">→</span>
-    </a>
-  `).join('');
+  
+  const linksHtml = entry.links.map(link => {
+    const outdatedClass = link.isOutdated ? 'outdated-link' : '';
+    const outdatedIcon = link.isOutdated ? '⚠️ ' : '';
+    return `
+      <a class="dl-btn ${outdatedClass}" href="${link.url}" target="_blank" rel="noopener">
+        <span class="icon">${outdatedIcon}${getLinkIcon(link.label)}</span>
+        <span class="label">${link.label.length > 50 ? link.label.slice(0, 48) + '…' : link.label}</span>
+        <span class="arrow">→</span>
+      </a>
+    `;
+  }).join('');
+  
   const noteHtml = entry.note ? `<p class="card-note">${escapeHtml(entry.note.slice(0, 120))}${entry.note.length > 120 ? '…' : ''}</p>` : '';
   
   return `
@@ -770,15 +815,4 @@ async function loadData() {
 // ========== EVENTOS ==========
 document.querySelectorAll('.filter-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentFilter = btn.dataset.filter;
-    applyFilters();
-  });
-});
-document.getElementById('search').addEventListener('input', applyFilters);
-
-loadData();
-</script>
-</body>
-</html>
+    document.querySelectorAll('.filter-btn').
