@@ -811,8 +811,18 @@ async function loadData() {
     </div>`;
   }
 }
-
 // ========== EVENTOS ==========
 document.querySelectorAll('.filter-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.filter-btn').
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    applyFilters();
+  });
+});
+document.getElementById('search').addEventListener('input', applyFilters);
+
+loadData();
+</script>
+</body>
+</html>
