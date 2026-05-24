@@ -778,11 +778,30 @@ function buildCard(entry, idx) {
 function applyFilters() {
   const grid = document.getElementById('grid');
   const search = document.getElementById('search').value.toLowerCase();
+  
+  console.log('Filtro atual:', currentFilter); // Debug
+  console.log('Total de cards:', allCards.length); // Debug
+  console.log('Cards com outdated:', allCards.filter(c => c.hasOutdated === true).length); // Debug
+  
   const filtered = allCards.filter(entry => {
-    const typeMatch = currentFilter === 'all' || entry.typesArray.includes(currentFilter);
+    // Filtro por tipo
+    let typeMatch = true;
+    if (currentFilter === 'all') {
+      typeMatch = true;
+    } else if (currentFilter === 'outdated') {
+      // Filtro especial: mostra apenas jogos com link desatualizado
+      typeMatch = entry.hasOutdated === true;
+      if (typeMatch) console.log('Card incluído no filtro outdated:', entry.game); // Debug
+    } else {
+      typeMatch = entry.typesArray.includes(currentFilter);
+    }
+    
     const searchMatch = !search || entry.game.toLowerCase().includes(search);
     return typeMatch && searchMatch;
   });
+  
+  console.log('Filtrados encontrados:', filtered.length); // Debug
+  
   if (filtered.length === 0) {
     grid.innerHTML = '<div class="empty">Nenhum resultado encontrado</div>';
     return;
