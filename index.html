@@ -337,7 +337,7 @@
   }
 
   /* Empty state */
-  .empty {
+  .empty, .error-state {
     grid-column: 1 / -1;
     padding: 80px;
     text-align: center;
@@ -345,6 +345,10 @@
     font-size: 13px;
     letter-spacing: 2px;
     text-transform: uppercase;
+  }
+
+  .error-state {
+    color: #ff6b6b;
   }
 
   /* Footer */
@@ -408,7 +412,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 40px;
+    font-size: 48px;
     user-select: none;
   }
 </style>
@@ -420,7 +424,7 @@
   <h1>CARE<br><span>PACKAGES</span></h1>
   <div class="header-meta">
     <span class="status-dot"></span>
-    <span>Sincronizado com Google Drive</span>
+    <span>Sincronizado com arquivo local</span>
     <span id="item-count" class="count-badge">—</span>
   </div>
 </header>
@@ -451,118 +455,88 @@
 </footer>
 
 <script>
-// ─── Data: parsed from the txt ───────────────────────────────────────────────
-// Since Google Drive txt requires auth to fetch live, we embed the parsed data
-// and the app re-fetches on load (falls back to embedded if blocked by CORS).
+// ============================================================
+// CONFIGURAÇÃO LOCAL
+// ============================================================
+const LOCAL_DATA_URL = 'assets/Care_Packages.txt';
+const IMAGES_BASE_PATH = 'assets/images/';
 
-const DRIVE_FILE_ID = '1mdY9ppbrtIQSj0OjOtdSkkYu-bItLn0A';
-const DRIVE_EXPORT_URL = `https://drive.google.com/uc?export=download&id=${DRIVE_FILE_ID}`;
-
-// Fallback embedded data (updated from the txt file)
-const EMBEDDED_TXT = `- Need for Speed Most Wanted: https://drive.google.com/file/d/1zRjjXGG6dYGpLw_Txfp6MIPRQWsiFdn3/view?usp=sharing
-
-- Mapa Bloodborne 9000 x 10000: https://drive.google.com/file/d/1VS6cDpYdr-fAPv1wEIsReE0gaRfBZE0K/view?usp=drive_link
-- Mapa Bloodborne 4500 x 9000: https://drive.google.com/file/d/19bnXzqgcrhkOxfU3Pwb4ZxOqZY0XknRt/view?usp=drive_link
-- Mapa Bloodborne (Projeto em .psd): https://drive.google.com/file/d/1CkjUBKGNe97pvvbKpB6lhEzFm_8fmohY/view?usp=drive_link
-
-- Dark Souls: https://drive.google.com/file/d/17YYeCdUKjgXE_dg53Jn8JXSye4OAstWA/view?usp=sharing
-  - Infográfico de upgrades: https://drive.google.com/file/d/1zIgLAQAm7uTynY-dxzBx0dESU1Ioz9y2/view?usp=sharing
-
-- Need for Speed Underground 2: https://drive.google.com/file/d/11SvsBEn50X6C3QjKMr5OLgSDvNO8atSB/view?usp=sharing
-
-- Beat Down: Fists of Vengeance
-  - Pack com emulador configurado, retextura, patches e infográfico (sem .iso ou BIOS): https://drive.google.com/file/d/1mpsdPthiy5FdJ5aq3JVWaYplUtoengp1/view?usp=sharing
-  - Apenas a retextura (colocar a pasta "SLUS-21150" em "Documents\\PCSX2": https://drive.google.com/file/d/1ApN0IPGlpE_xcfh6zIXVfaRB7ti1iqOC/view?usp=sharing
-  - Apenas o infográfico em inglês: https://drive.google.com/file/d/1b5XLhyGyxErsaGNSAI4-kTqVzFCXMO92/view?usp=sharing
-  - Apenas o infográfico em PTBR: https://drive.google.com/file/d/1E0RYyUSlCgVtEXQAv8cAijRrrmaxtKVV/view?usp=sharing
-  - Apenas o arquivo de cheats atualizado: https://drive.google.com/file/d/1HO2xrO_pXxs-T721UHvSSjqMOPJsxwQq/view?usp=sharing
-
-- Retextura do God Hand: https://drive.google.com/file/d/13F3xptdnGi93c99Wkk4f-YOe-px74YWB/view?usp=sharing
-  Colocar a pasta "SLUS-21503" em: "Documents\\PCSX2\\textures" e ativar a substituição de texturas nas configs do jogo no emulador. Alternativamente basta apertar "M" enquanto joga. 
-
-- Mod pack do Fallout New Vegas: https://drive.google.com/file/d/11Rp6Om32mX7NyPmR5ZXiTpilKcZWBFQ7/view?usp=sharing
-
-- Lista de mods baixados e alterações feitas do S.T.A.L.K.E.R Call of Pripyat: https://drive.google.com/file/d/1BCmXzkV0Finpaan34LXIEPPoAG1IhoiN/view?usp=sharing
-
-- Lista de mods baixados e alterações feitas do S.T.A.L.K.E.R Clear Sky: https://drive.google.com/file/d/1tm2TgSD64ZJRfsW3JNQEcXhq0TEDI879/view?usp=sharing
-
-- Lista de mods baixados e alterações feitas do S.T.A.L.K.E.R Call of Chernobyl: https://drive.google.com/file/d/152s0Xo5PTZEty1xd3ukf2-PhYr8p2c1s/view?usp=sharing
-
-- Lista de mods do Borderlands 3, rushado e sem tutorial mas taaí: https://drive.google.com/file/d/1pbPRuCi2NiwJ0IkBLnawQuGs1yB2JYfU/view?usp=sharing
-
-- Mod de rebalanceamento de drops do Yu-Gi-Oh! Forbidden Memories: https://drive.google.com/file/d/1I0RW04BXT3taotrPSmDdf2px74YWB/view?usp=sharing
-
-- Pack de retextura do Yu-Gi-Oh! GX Tag Force: https://drive.google.com/file/d/15CB4Drar8eYJlD2WSCrXywuvrSjFLYRr/view?usp=sharing
-
-- Pack de retextura do Yu-Gi-Oh! Capsule Monster Coliseum: https://drive.google.com/file/d/1osYGS9EWHdAZ5dXiBFW82QiCd08HU1Zh/view?usp=sharing
-
-- Mod de rebalanceamento do FFXII: https://www.nexusmods.com/finalfantasy12/mods/324
-  Apenas disponível em inglês, instruções no site. 
-
-- Pack de mods configurados do Fallout 2: https://drive.google.com/file/d/1CClCdUzQv4pRdQQwAuZZXURv0rnuueP0/view?usp=sharing
-
-- Gran Turismo 4 modificado: https://drive.google.com/file/d/18xXbKxnPoReJKwuBYT2KUtgWsa0P0sKi/view?usp=sharing
-
-- Pack de mods do Monster Hunter - World: https://drive.google.com/file/d/1x7UhSnpcjSMunPFbhbzoXOyqbpcJIK_y/view?usp=sharing
-
-- Pack de mods usados no RE5: https://drive.google.com/file/d/1bPLdkzmrZt6Jphs8fYO7roMkSX_LfaON/view?usp=sharing
-
-- Pack de mods do RE Revelations 2: https://drive.google.com/file/d/1B12EIA5cPURDRjRSHYNsJlJKO8TJQhau/view?usp=sharing
-
-- Pack de mods do GTA IV (desatualizado?): https://drive.google.com/file/d/1zljSp6SnqsYGtMO7JkWO9blzZZEqxgMm/view?usp=sharing
-
-- Care Package do Deadly Premonition: https://drive.google.com/file/d/14r7iYai2BTqPba7pLJILC-vAXyl-Q3_p/view?usp=sharing
-
-- Pack de mods do NFS 2015: https://drive.google.com/file/d/1Ykuy4nCUF-8uPW-Ub_Gp5gOrxyKWqg6g/view?usp=sharing
-
-- Pack de mods do GTA SA: https://drive.google.com/file/d/1nMjFCoO5_QW_yzaVMQraV2rMKKChlqlY/view?usp=sharing
-
-- Infográfico do Sons of the Forest: https://drive.google.com/file/d/1jApMSo7lZ8Kg2O_KeBnaaLSt8NMRsyb-/view?usp=sharing
-- Infográfico do Yugioh Capsule Monster Coliseum: https://drive.google.com/file/d/1nXJehB5T9oeQhPksM9Qz5JfHicURcKyN/view?usp=sharing
-- Infográfico do Monster Hunter World: https://drive.google.com/file/d/1a4jFwgMALxmuP9C2ewfliBZ6u_Asg1zp/view?usp=sharing
-- Tabela de armas do RE4 Remake (ENG): https://drive.google.com/file/d/1qjbzlJdflKbTnPb13YxNh26aMWR9WyxD/view?usp=sharing
-- Tabela de armas do RE4 Remake (PT): https://drive.google.com/file/d/1CtAFP-oNOTF8AcjrXitoAY5JVIWUVZdt/view?usp=sharing
-
-PS: Essa lista é temporária e pode ter packs desatualizados, a ideia era só ter um lugar pra centralizar tudo q eu já deixei pra download pelas lives ao longo dos anos.`;
-
-// ─── Game image map (RAWG / SteamGrid public art via search) ─────────────────
-const GAME_IMAGES = {
-  'Need for Speed Most Wanted': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1238820/header.jpg',
-  'Bloodborne': 'https://image.api.playstation.com/cdn/UP9000/CUSA00207_00/OSTlnea7sFJoURpDgxlIyqkTLHuiCPUM.png',
-  'Dark Souls': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/211420/header.jpg',
-  'Need for Speed Underground 2': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1367060/header.jpg',
-  'Beat Down: Fists of Vengeance': 'https://upload.wikimedia.org/wikipedia/en/3/3c/BeatDownFistsofVengeanceCoverart.png',
-  'God Hand': 'https://upload.wikimedia.org/wikipedia/en/2/29/GodHandCoverart.png',
-  'Fallout New Vegas': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/22380/header.jpg',
-  'S.T.A.L.K.E.R Call of Pripyat': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/41700/header.jpg',
-  'S.T.A.L.K.E.R Clear Sky': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/20510/header.jpg',
-  'S.T.A.L.K.E.R Call of Chernobyl': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/41700/header.jpg',
-  'Borderlands 3': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/397540/header.jpg',
-  "Yu-Gi-Oh! Forbidden Memories": 'https://upload.wikimedia.org/wikipedia/en/0/07/Yu-Gi-Oh%21_Forbidden_Memories_cover.jpg',
-  "Yu-Gi-Oh! GX Tag Force": 'https://upload.wikimedia.org/wikipedia/en/6/63/Yugiohtf.jpg',
-  "Yu-Gi-Oh! Capsule Monster Coliseum": 'https://upload.wikimedia.org/wikipedia/en/4/4e/Yu-Gi-Oh%21_Capsule_Monster_Coliseum.jpg',
-  'Final Fantasy XII': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/595620/header.jpg',
-  'Fallout 2': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/38410/header.jpg',
-  'Gran Turismo 4': 'https://upload.wikimedia.org/wikipedia/en/thumb/c/c8/GranTurismo4-PS2-US.jpg/220px-GranTurismo4-PS2-US.jpg',
-  'Monster Hunter World': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/582010/header.jpg',
-  'Resident Evil 5': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/21690/header.jpg',
-  'RE Revelations 2': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/287290/header.jpg',
-  'GTA IV': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/12210/header.jpg',
-  'Deadly Premonition': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/347580/header.jpg',
-  'NFS 2015': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1262800/header.jpg',
-  'GTA SA': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/12120/header.jpg',
-  'Sons of the Forest': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1326470/header.jpg',
-  'RE4 Remake': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2050650/header.jpg',
+// Mapeamento de nomes de jogo para nomes de arquivo de imagem (sem extensão)
+// Baseado na lista fornecida dos arquivos .jpg disponíveis
+const IMAGE_FILENAME_MAP = {
+  "Need for Speed Most Wanted": "need-for-speed-most-wanted",
+  "Bloodborne": "bloodborne",
+  "Dark Souls": "dark-souls",
+  "Need for Speed Underground 2": "need-for-speed-underground-2",
+  "Beat Down: Fists of Vengeance": "beat-down-fists-of-vengeance",
+  "God Hand": "god-hand",
+  "Fallout New Vegas": "fallout-new-vegas",
+  "S.T.A.L.K.E.R Call of Pripyat": "stalker-call-of-pripyat",
+  "S.T.A.L.K.E.R Clear Sky": "stalker-clear-sky",
+  "S.T.A.L.K.E.R Call of Chernobyl": "stalker-call-of-chernobyl",
+  "Borderlands 3": "borderlands-3",
+  "Yu-Gi-Oh! Forbidden Memories": "yugioh-forbidden-memories",
+  "Yu-Gi-Oh! GX Tag Force": "yugioh-gx-tag-force",
+  "Yu-Gi-Oh! Capsule Monster Coliseum": "yugioh-capsule-monster-coliseum",
+  "Final Fantasy XII": "final-fantasy-xii",
+  "Fallout 2": "fallout-2",
+  "Gran Turismo 4": "gran-turismo-4",
+  "Monster Hunter World": "monster-hunter-world",
+  "Resident Evil 5": "resident-evil-5",
+  "RE Revelations 2": "re-revelations-2",
+  "GTA IV": "gta-iv",
+  "Deadly Premonition": "deadly-premonition",
+  "NFS 2015": "nfs-2015",
+  "GTA SA": "gta-sa",
+  "Sons of the Forest": "sons-of-the-forest",
+  "RE4 Remake": "re4-remake"
 };
 
-// Game emoji fallback
-const GAME_EMOJI = {
-  'racing': '🏎️', 'souls': '⚔️', 'horror': '🧟', 'stalker': '☢️',
-  'fallout': '☢️', 'yugioh': '🃏', 'gta': '🔫', 'monster': '🐉',
-  'default': '🎮'
-};
+// Função para normalizar e tentar encontrar imagem
+function getGameImagePath(gameName) {
+  // Tenta busca exata no mapa
+  for (const [key, filename] of Object.entries(IMAGE_FILENAME_MAP)) {
+    if (gameName.toLowerCase() === key.toLowerCase()) {
+      return `${IMAGES_BASE_PATH}${filename}.jpg`;
+    }
+  }
+  // Tenta busca parcial (ex: "Resident Evil 5" vs "Resident Evil 5")
+  for (const [key, filename] of Object.entries(IMAGE_FILENAME_MAP)) {
+    if (gameName.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(gameName.toLowerCase())) {
+      return `${IMAGES_BASE_PATH}${filename}.jpg`;
+    }
+  }
+  // Fallback: gera slug a partir do nome (ex: "Dark Souls" -> "dark-souls")
+  const slug = gameName.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+  return `${IMAGES_BASE_PATH}${slug}.jpg`;
+}
 
-// ─── Parser ───────────────────────────────────────────────────────────────────
+// Emojis temáticos para fallback
+function getGameEmoji(game) {
+  const l = game.toLowerCase();
+  if (l.includes('need for speed') || l.includes('gran turismo') || l.includes('nfs')) return '🏎️';
+  if (l.includes('bloodborne') || l.includes('dark souls')) return '⚔️';
+  if (l.includes('stalker')) return '☢️';
+  if (l.includes('fallout')) return '☢️';
+  if (l.includes('yu-gi-oh') || l.includes('yugioh')) return '🃏';
+  if (l.includes('gta') || l.includes('beat down')) return '🔫';
+  if (l.includes('monster hunter')) return '🐉';
+  if (l.includes('resident evil') || l.includes('deadly premonition')) return '🧟';
+  if (l.includes('final fantasy')) return '⚗️';
+  if (l.includes('god hand')) return '👊';
+  if (l.includes('sons of the forest')) return '🌲';
+  if (l.includes('borderlands')) return '🎯';
+  return '🎮';
+}
+
+// ============================================================
+// PARSER DO TXT (mesma lógica original)
+// ============================================================
 function parseTxt(txt) {
   const lines = txt.split('\n');
   const games = [];
@@ -585,7 +559,6 @@ function parseTxt(txt) {
       const noUrlMatch = rest.match(/^(.+?)(?::)?$/);
 
       if (urlMatch) {
-        // Single-link top-level
         const label = urlMatch[1].trim();
         const url = urlMatch[2].trim();
         const note = urlMatch[3].trim();
@@ -599,14 +572,12 @@ function parseTxt(txt) {
           games.push(current);
         }
       } else if (noUrlMatch) {
-        // Group header (sub-items follow)
         const label = rest.replace(/:$/, '').trim();
         const { game } = classifyLabel(label);
         current = { game, type: 'modpack', links: [], note: '' };
         games.push(current);
       }
     } else if (/^\s{2,}/.test(raw) && trimmed.startsWith('- ')) {
-      // Sub-item
       const rest = trimmed.slice(2);
       const urlMatch = rest.match(/^(.+?):\s*(https?:\/\/\S+)(.*)$/);
       if (urlMatch && current) {
@@ -616,7 +587,6 @@ function parseTxt(txt) {
         current.links.push({ label: sublabel, url, type });
       }
     } else if (/^\s{2,}/.test(raw) && trimmed && current && !trimmed.startsWith('-')) {
-      // Note line
       if (current && !trimmed.startsWith('http')) {
         current.note = (current.note ? current.note + ' ' : '') + trimmed;
       }
@@ -670,7 +640,6 @@ function classifyLabel(label) {
     .replace(/\bGTA IV\b/i, 'GTA IV')
     .replace(/\bGTA SA\b/i, 'GTA SA')
     .replace(/\bFFXII\b/i, 'Final Fantasy XII')
-    .replace(/\bFFXII\b/i, 'Final Fantasy XII')
     .replace(/^S\.T\.A\.L\.K\.E\.R Call of (.+)/i, 'S.T.A.L.K.E.R $1')
     .replace(/Yu-Gi-Oh!/i, 'Yu-Gi-Oh!')
     .replace(/Monster Hunter - World/i, 'Monster Hunter World');
@@ -680,17 +649,15 @@ function classifyLabel(label) {
 
 function getMainType(type, label) {
   const l = label.toLowerCase();
-  if (l.includes('mapa') || l.includes('bloodborne') && l.includes('mapa')) return 'map';
+  if (l.includes('mapa') || (l.includes('bloodborne') && l.includes('mapa'))) return 'map';
   return type;
 }
 
 function getShortLabel(label, type) {
-  // Shorten labels for display
   const clean = label
     .replace(/^(?:pack de mods (?:do|usados no|configurados do)|mod pack do|retextura do|pack de retextura do|lista de mods (?:baixados e alterações feitas do|do)|mod de rebalanceamento (?:de drops do|do)|care package do|infográfico do|tabela de armas do|mapa)\s+/i, '')
     .trim();
-
-  if (clean === label) return label; // Already short
+  if (clean === label) return label;
   return clean;
 }
 
@@ -708,49 +675,26 @@ function getLinkIcon(label) {
   if (l.includes('ptbr') || l.includes('pt)')) return '🇧🇷';
   if (l.includes('eng') || l.includes('inglês') || l.includes('inglés')) return '🇺🇸';
   if (l.includes('mapa') || l.includes('.psd')) return '🗺️';
-  if (l.includes('upgrade') || l.includes('upgrade')) return '⬆️';
+  if (l.includes('upgrade')) return '⬆️';
   if (l.includes('lista')) return '📋';
   return '⬇️';
 }
 
-function getGameImage(game) {
-  for (const [key, url] of Object.entries(GAME_IMAGES)) {
-    if (game.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(game.toLowerCase())) {
-      return url;
-    }
-  }
-  return null;
-}
-
-function getGameEmoji(game) {
-  const l = game.toLowerCase();
-  if (l.includes('need for speed') || l.includes('gran turismo') || l.includes('nfs')) return '🏎️';
-  if (l.includes('bloodborne') || l.includes('dark souls')) return '⚔️';
-  if (l.includes('stalker')) return '☢️';
-  if (l.includes('fallout')) return '☢️';
-  if (l.includes('yu-gi-oh') || l.includes('yugioh')) return '🃏';
-  if (l.includes('gta') || l.includes('beat down')) return '🔫';
-  if (l.includes('monster hunter')) return '🐉';
-  if (l.includes('resident evil') || l.includes('deadly premonition')) return '🧟';
-  if (l.includes('final fantasy')) return '⚗️';
-  if (l.includes('god hand')) return '👊';
-  if (l.includes('sons of the forest')) return '🌲';
-  if (l.includes('borderlands')) return '🎯';
-  return '🎮';
-}
-
-// ─── Render ───────────────────────────────────────────────────────────────────
+// ============================================================
+// RENDERIZAÇÃO
+// ============================================================
 let allCards = [];
 let currentFilter = 'all';
 
 function buildCard(entry, idx) {
-  const imgUrl = getGameImage(entry.game);
+  const imgPath = getGameImagePath(entry.game);
   const emoji = getGameEmoji(entry.game);
   const mainType = entry.links[0]?.type || entry.type || 'modpack';
 
-  const imageHtml = imgUrl
-    ? `<img class="card-image" src="${imgUrl}" alt="${entry.game}" onerror="this.parentNode.innerHTML='<div class=\\'img-placeholder\\'>${emoji}</div>'">`
-    : `<div class="img-placeholder">${emoji}</div>`;
+  const imageHtml = `
+    <img class="card-image" src="${imgPath}" alt="${entry.game}" 
+         onerror="this.onerror=null; this.parentNode.innerHTML='<div class=\\'img-placeholder\\'>${emoji}</div>';">
+  `;
 
   const linksHtml = entry.links.map(link => `
     <a class="dl-btn" href="${link.url}" target="_blank" rel="noopener">
@@ -771,7 +715,7 @@ function buildCard(entry, idx) {
         <span class="card-type-badge ${mainType}">${getTypeLabel(mainType)}</span>
       </div>
       <div class="card-body">
-        <div class="card-game">${entry.game}</div>
+        <div class="card-game">${escapeHtml(entry.game)}</div>
         ${noteHtml}
         <div class="card-links">${linksHtml}</div>
       </div>
@@ -779,13 +723,22 @@ function buildCard(entry, idx) {
   `;
 }
 
+// Função simples para evitar XSS
+function escapeHtml(str) {
+  return str.replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
+  });
+}
+
 function renderGrid(games) {
-  const grid = document.getElementById('grid');
   allCards = games;
   applyFilters();
   document.getElementById('item-count').textContent = `${games.length} games`;
   document.getElementById('loading').style.display = 'none';
-  grid.style.display = 'grid';
+  document.getElementById('grid').style.display = 'grid';
 }
 
 function applyFilters() {
@@ -806,41 +759,56 @@ function applyFilters() {
   grid.innerHTML = filtered.map((e, i) => buildCard(e, i)).join('');
 }
 
-// ─── Load ─────────────────────────────────────────────────────────────────────
+// ============================================================
+// CARREGAMENTO DO ARQUIVO LOCAL
+// ============================================================
 async function loadData() {
-  let txt = EMBEDDED_TXT;
-
-  // Try to fetch live from Drive (works if file is public + no CORS issue)
+  const loadingDiv = document.getElementById('loading');
+  const gridDiv = document.getElementById('grid');
+  
   try {
-    const res = await fetch(DRIVE_EXPORT_URL, { signal: AbortSignal.timeout(5000) });
-    if (res.ok) {
-      const fetchedTxt = await res.text();
-      if (fetchedTxt.includes('drive.google.com')) txt = fetchedTxt;
+    const response = await fetch(LOCAL_DATA_URL);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: Não foi possível carregar ${LOCAL_DATA_URL}`);
     }
-  } catch (e) {
-    console.log('Using embedded data (Drive fetch blocked by CORS — expected in browser)');
-  }
-
-  const { games, ps } = parseTxt(txt);
-
-  // Merge entries with same game
-  const merged = [];
-  for (const g of games) {
-    const ex = merged.find(m => m.game.toLowerCase() === g.game.toLowerCase());
-    if (ex) {
-      ex.links.push(...g.links);
-      if (g.note) ex.note = (ex.note ? ex.note + ' ' : '') + g.note;
-    } else {
-      merged.push({ ...g });
+    const txt = await response.text();
+    
+    // Validação básica: se não contém links do drive, avisa mas continua
+    if (!txt.includes('drive.google.com') && !txt.includes('nexusmods.com')) {
+      console.warn('O arquivo parece não conter links de download válidos.');
     }
+    
+    const { games, ps } = parseTxt(txt);
+    
+    // Mescla entradas com mesmo jogo
+    const merged = [];
+    for (const g of games) {
+      const ex = merged.find(m => m.game.toLowerCase() === g.game.toLowerCase());
+      if (ex) {
+        ex.links.push(...g.links);
+        if (g.note) ex.note = (ex.note ? ex.note + ' ' : '') + g.note;
+      } else {
+        merged.push({ ...g });
+      }
+    }
+    
+    if (ps) document.getElementById('footer-ps').textContent = ps;
+    renderGrid(merged);
+    
+  } catch (error) {
+    console.error('Erro ao carregar dados locais:', error);
+    loadingDiv.style.display = 'none';
+    gridDiv.style.display = 'grid';
+    gridDiv.innerHTML = `<div class="empty error-state">
+      ⚠️ Erro ao carregar <strong>${LOCAL_DATA_URL}</strong><br>
+      Verifique se o arquivo existe no diretório "assets/" e tente novamente.
+    </div>`;
   }
-
-  if (ps) document.getElementById('footer-ps').textContent = ps;
-
-  renderGrid(merged);
 }
 
-// ─── Events ───────────────────────────────────────────────────────────────────
+// ============================================================
+// EVENTOS E INICIALIZAÇÃO
+// ============================================================
 document.querySelectorAll('.filter-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -852,7 +820,7 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
 
 document.getElementById('search').addEventListener('input', applyFilters);
 
-// ─── Init ─────────────────────────────────────────────────────────────────────
+// Inicia o carregamento
 loadData();
 </script>
 </body>
