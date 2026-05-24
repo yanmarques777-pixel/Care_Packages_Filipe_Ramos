@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Care Packages — Filipe Ramos</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --surface: #111116;
+    --surface2: #18181f;
+    --border: #2a2a35;
+    --accent: #e8ff47;
+    --accent2: #ff6b35;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --card-hover: #1c1c26;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    cursor: crosshair;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* Header */
+  header {
+    padding: 60px 40px 40px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::after {
+    content: 'CARE\APKG';
+    white-space: pre;
+    position: absolute;
+    right: -20px;
+    top: -10px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 180px;
+    color: rgba(232,255,71,0.03);
+    line-height: 0.9;
+    pointer-events: none;
+    letter-spacing: -5px;
+  }
+
+  .header-tag {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .header-tag::before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(56px, 8vw, 110px);
+    line-height: 0.9;
+    letter-spacing: -2px;
+    color: var(--text);
+  }
+
+  h1 span {
+    color: var(--accent);
+  }
+
+  .header-meta {
+    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+    display: inline-block;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  /* Controls */
+  .controls {
+    padding: 24px 40px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .filter-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-right: 4px;
+  }
+
+  .filter-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 6px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .filter-btn:hover, .filter-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(232,255,71,0.05);
+  }
+
+  .search-wrap {
+    margin-left: auto;
+    position: relative;
+  }
+
+  .search-wrap input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 14px 6px 36px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    width: 220px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-wrap input:focus {
+    border-color: var(--accent);
+  }
+
+  .search-wrap::before {
+    content: '⌕';
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 16px;
+  }
+
+  /* Grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border-top: 1px solid var(--border);
+  }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    transition: background 0.2s;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .card:hover {
+    background: var(--card-hover);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+    filter: grayscale(20%) brightness(0.85);
+    transition: filter 0.3s;
+    background: var(--surface2);
+    position: relative;
+  }
+
+  .card:hover .card-image {
+    filter: grayscale(0%) brightness(1);
+  }
+
+  .card-image-wrap {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card-image-wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 40%, rgba(10,10,12,0.8));
+    pointer-events: none;
+  }
+
+  .card-type-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--accent2);
+    color: white;
+    font-size: 9px;
+    letter-spacing: 2px;
+    padding: 3px 8px;
+    text-transform: uppercase;
+    font-family: 'DM Mono', monospace;
+    z-index: 2;
+  }
+
+  .card-type-badge.infographic { background: #4a90d9; }
+  .card-type-badge.modpack { background: var(--accent2); }
+  .card-type-badge.retexture { background: #9b59b6; }
+  .card-type-badge.map { background: #27ae60; }
+  .card-type-badge.list { background: #e67e22; }
+
+  .card-body {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-game {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+
+  .card-note {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 16px;
+    flex: 1;
+    font-style: italic;
+  }
+
+  .card-links {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .dl-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    text-decoration: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+
+  .dl-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(232,255,71,0.06);
+  }
+
+  .dl-btn .icon {
+    opacity: 0.5;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  .dl-btn:hover .icon { opacity: 1; }
+
+  .dl-btn .label {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .dl-btn .arrow {
+    opacity: 0;
+    transition: opacity 0.15s, transform 0.15s;
+    font-size: 12px;
+  }
+
+  .dl-btn:hover .arrow {
+    opacity: 1;
+    transform: translateX(3px);
+  }
+
+  /* Empty state */
+  .empty {
+    grid-column: 1 / -1;
+    padding: 80px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* Footer */
+  footer {
+    padding: 32px 40px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .footer-ps {
+    max-width: 500px;
+    line-height: 1.7;
+    font-style: italic;
+  }
+
+  /* Loading */
+  #loading {
+    padding: 100px 40px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .loader {
+    width: 32px;
+    height: 32px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .count-badge {
+    background: rgba(232,255,71,0.12);
+    color: var(--accent);
+    font-size: 10px;
+    padding: 2px 8px;
+    letter-spacing: 2px;
+  }
+
+  /* Image placeholder */
+  .img-placeholder {
+    width: 100%;
+    height: 180px;
+    background: var(--surface2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    user-select: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">by Filipe Ramos · Atualizado automaticamente</div>
+  <h1>CARE<br><span>PACKAGES</span></h1>
+  <div class="header-meta">
+    <span class="status-dot"></span>
+    <span>Sincronizado com Google Drive</span>
+    <span id="item-count" class="count-badge">—</span>
+  </div>
+</header>
+
+<div class="controls">
+  <span class="filter-label">Filtrar:</span>
+  <button class="filter-btn active" data-filter="all">Todos</button>
+  <button class="filter-btn" data-filter="modpack">Modpacks</button>
+  <button class="filter-btn" data-filter="retexture">Retexturas</button>
+  <button class="filter-btn" data-filter="infographic">Infográficos</button>
+  <button class="filter-btn" data-filter="map">Mapas</button>
+  <button class="filter-btn" data-filter="list">Listas</button>
+  <div class="search-wrap">
+    <input type="text" id="search" placeholder="Buscar jogo...">
+  </div>
+</div>
+
+<div id="loading">
+  <div class="loader"></div>
+  Carregando care packages...
+</div>
+
+<div class="grid" id="grid" style="display:none"></div>
+
+<footer>
+  <div class="footer-ps" id="footer-ps"></div>
+  <div>care-packages.html</div>
+</footer>
+
+<script>
+// ─── Data: parsed from the txt ───────────────────────────────────────────────
+// Since Google Drive txt requires auth to fetch live, we embed the parsed data
+// and the app re-fetches on load (falls back to embedded if blocked by CORS).
+
+const DRIVE_FILE_ID = '1mdY9ppbrtIQSj0OjOtdSkkYu-bItLn0A';
+const DRIVE_EXPORT_URL = `https://drive.google.com/uc?export=download&id=${DRIVE_FILE_ID}`;
+
+// Fallback embedded data (updated from the txt file)
+const EMBEDDED_TXT = `- Need for Speed Most Wanted: https://drive.google.com/file/d/1zRjjXGG6dYGpLw_Txfp6MIPRQWsiFdn3/view?usp=sharing
+
+- Mapa Bloodborne 9000 x 10000: https://drive.google.com/file/d/1VS6cDpYdr-fAPv1wEIsReE0gaRfBZE0K/view?usp=drive_link
+- Mapa Bloodborne 4500 x 9000: https://drive.google.com/file/d/19bnXzqgcrhkOxfU3Pwb4ZxOqZY0XknRt/view?usp=drive_link
+- Mapa Bloodborne (Projeto em .psd): https://drive.google.com/file/d/1CkjUBKGNe97pvvbKpB6lhEzFm_8fmohY/view?usp=drive_link
+
+- Dark Souls: https://drive.google.com/file/d/17YYeCdUKjgXE_dg53Jn8JXSye4OAstWA/view?usp=sharing
+  - Infográfico de upgrades: https://drive.google.com/file/d/1zIgLAQAm7uTynY-dxzBx0dESU1Ioz9y2/view?usp=sharing
+
+- Need for Speed Underground 2: https://drive.google.com/file/d/11SvsBEn50X6C3QjKMr5OLgSDvNO8atSB/view?usp=sharing
+
+- Beat Down: Fists of Vengeance
+  - Pack com emulador configurado, retextura, patches e infográfico (sem .iso ou BIOS): https://drive.google.com/file/d/1mpsdPthiy5FdJ5aq3JVWaYplUtoengp1/view?usp=sharing
+  - Apenas a retextura (colocar a pasta "SLUS-21150" em "Documents\\PCSX2": https://drive.google.com/file/d/1ApN0IPGlpE_xcfh6zIXVfaRB7ti1iqOC/view?usp=sharing
+  - Apenas o infográfico em inglês: https://drive.google.com/file/d/1b5XLhyGyxErsaGNSAI4-kTqVzFCXMO92/view?usp=sharing
+  - Apenas o infográfico em PTBR: https://drive.google.com/file/d/1E0RYyUSlCgVtEXQAv8cAijRrrmaxtKVV/view?usp=sharing
+  - Apenas o arquivo de cheats atualizado: https://drive.google.com/file/d/1HO2xrO_pXxs-T721UHvSSjqMOPJsxwQq/view?usp=sharing
+
+- Retextura do God Hand: https://drive.google.com/file/d/13F3xptdnGi93c99Wkk4f-YOe-px74YWB/view?usp=sharing
+  Colocar a pasta "SLUS-21503" em: "Documents\\PCSX2\\textures" e ativar a substituição de texturas nas configs do jogo no emulador. Alternativamente basta apertar "M" enquanto joga. 
+
+- Mod pack do Fallout New Vegas: https://drive.google.com/file/d/11Rp6Om32mX7NyPmR5ZXiTpilKcZWBFQ7/view?usp=sharing
+
+- Lista de mods baixados e alterações feitas do S.T.A.L.K.E.R Call of Pripyat: https://drive.google.com/file/d/1BCmXzkV0Finpaan34LXIEPPoAG1IhoiN/view?usp=sharing
+
+- Lista de mods baixados e alterações feitas do S.T.A.L.K.E.R Clear Sky: https://drive.google.com/file/d/1tm2TgSD64ZJRfsW3JNQEcXhq0TEDI879/view?usp=sharing
+
+- Lista de mods baixados e alterações feitas do S.T.A.L.K.E.R Call of Chernobyl: https://drive.google.com/file/d/152s0Xo5PTZEty1xd3ukf2-PhYr8p2c1s/view?usp=sharing
+
+- Lista de mods do Borderlands 3, rushado e sem tutorial mas taaí: https://drive.google.com/file/d/1pbPRuCi2NiwJ0IkBLnawQuGs1yB2JYfU/view?usp=sharing
+
+- Mod de rebalanceamento de drops do Yu-Gi-Oh! Forbidden Memories: https://drive.google.com/file/d/1I0RW04BXT3taotrPSmDdf2px74YWB/view?usp=sharing
+
+- Pack de retextura do Yu-Gi-Oh! GX Tag Force: https://drive.google.com/file/d/15CB4Drar8eYJlD2WSCrXywuvrSjFLYRr/view?usp=sharing
+
+- Pack de retextura do Yu-Gi-Oh! Capsule Monster Coliseum: https://drive.google.com/file/d/1osYGS9EWHdAZ5dXiBFW82QiCd08HU1Zh/view?usp=sharing
+
+- Mod de rebalanceamento do FFXII: https://www.nexusmods.com/finalfantasy12/mods/324
+  Apenas disponível em inglês, instruções no site. 
+
+- Pack de mods configurados do Fallout 2: https://drive.google.com/file/d/1CClCdUzQv4pRdQQwAuZZXURv0rnuueP0/view?usp=sharing
+
+- Gran Turismo 4 modificado: https://drive.google.com/file/d/18xXbKxnPoReJKwuBYT2KUtgWsa0P0sKi/view?usp=sharing
+
+- Pack de mods do Monster Hunter - World: https://drive.google.com/file/d/1x7UhSnpcjSMunPFbhbzoXOyqbpcJIK_y/view?usp=sharing
+
+- Pack de mods usados no RE5: https://drive.google.com/file/d/1bPLdkzmrZt6Jphs8fYO7roMkSX_LfaON/view?usp=sharing
+
+- Pack de mods do RE Revelations 2: https://drive.google.com/file/d/1B12EIA5cPURDRjRSHYNsJlJKO8TJQhau/view?usp=sharing
+
+- Pack de mods do GTA IV (desatualizado?): https://drive.google.com/file/d/1zljSp6SnqsYGtMO7JkWO9blzZZEqxgMm/view?usp=sharing
+
+- Care Package do Deadly Premonition: https://drive.google.com/file/d/14r7iYai2BTqPba7pLJILC-vAXyl-Q3_p/view?usp=sharing
+
+- Pack de mods do NFS 2015: https://drive.google.com/file/d/1Ykuy4nCUF-8uPW-Ub_Gp5gOrxyKWqg6g/view?usp=sharing
+
+- Pack de mods do GTA SA: https://drive.google.com/file/d/1nMjFCoO5_QW_yzaVMQraV2rMKKChlqlY/view?usp=sharing
+
+- Infográfico do Sons of the Forest: https://drive.google.com/file/d/1jApMSo7lZ8Kg2O_KeBnaaLSt8NMRsyb-/view?usp=sharing
+- Infográfico do Yugioh Capsule Monster Coliseum: https://drive.google.com/file/d/1nXJehB5T9oeQhPksM9Qz5JfHicURcKyN/view?usp=sharing
+- Infográfico do Monster Hunter World: https://drive.google.com/file/d/1a4jFwgMALxmuP9C2ewfliBZ6u_Asg1zp/view?usp=sharing
+- Tabela de armas do RE4 Remake (ENG): https://drive.google.com/file/d/1qjbzlJdflKbTnPb13YxNh26aMWR9WyxD/view?usp=sharing
+- Tabela de armas do RE4 Remake (PT): https://drive.google.com/file/d/1CtAFP-oNOTF8AcjrXitoAY5JVIWUVZdt/view?usp=sharing
+
+PS: Essa lista é temporária e pode ter packs desatualizados, a ideia era só ter um lugar pra centralizar tudo q eu já deixei pra download pelas lives ao longo dos anos.`;
+
+// ─── Game image map (RAWG / SteamGrid public art via search) ─────────────────
+const GAME_IMAGES = {
+  'Need for Speed Most Wanted': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1238820/header.jpg',
+  'Bloodborne': 'https://image.api.playstation.com/cdn/UP9000/CUSA00207_00/OSTlnea7sFJoURpDgxlIyqkTLHuiCPUM.png',
+  'Dark Souls': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/211420/header.jpg',
+  'Need for Speed Underground 2': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1367060/header.jpg',
+  'Beat Down: Fists of Vengeance': 'https://upload.wikimedia.org/wikipedia/en/3/3c/BeatDownFistsofVengeanceCoverart.png',
+  'God Hand': 'https://upload.wikimedia.org/wikipedia/en/2/29/GodHandCoverart.png',
+  'Fallout New Vegas': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/22380/header.jpg',
+  'S.T.A.L.K.E.R Call of Pripyat': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/41700/header.jpg',
+  'S.T.A.L.K.E.R Clear Sky': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/20510/header.jpg',
+  'S.T.A.L.K.E.R Call of Chernobyl': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/41700/header.jpg',
+  'Borderlands 3': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/397540/header.jpg',
+  "Yu-Gi-Oh! Forbidden Memories": 'https://upload.wikimedia.org/wikipedia/en/0/07/Yu-Gi-Oh%21_Forbidden_Memories_cover.jpg',
+  "Yu-Gi-Oh! GX Tag Force": 'https://upload.wikimedia.org/wikipedia/en/6/63/Yugiohtf.jpg',
+  "Yu-Gi-Oh! Capsule Monster Coliseum": 'https://upload.wikimedia.org/wikipedia/en/4/4e/Yu-Gi-Oh%21_Capsule_Monster_Coliseum.jpg',
+  'Final Fantasy XII': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/595620/header.jpg',
+  'Fallout 2': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/38410/header.jpg',
+  'Gran Turismo 4': 'https://upload.wikimedia.org/wikipedia/en/thumb/c/c8/GranTurismo4-PS2-US.jpg/220px-GranTurismo4-PS2-US.jpg',
+  'Monster Hunter World': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/582010/header.jpg',
+  'Resident Evil 5': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/21690/header.jpg',
+  'RE Revelations 2': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/287290/header.jpg',
+  'GTA IV': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/12210/header.jpg',
+  'Deadly Premonition': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/347580/header.jpg',
+  'NFS 2015': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1262800/header.jpg',
+  'GTA SA': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/12120/header.jpg',
+  'Sons of the Forest': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1326470/header.jpg',
+  'RE4 Remake': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2050650/header.jpg',
+};
+
+// Game emoji fallback
+const GAME_EMOJI = {
+  'racing': '🏎️', 'souls': '⚔️', 'horror': '🧟', 'stalker': '☢️',
+  'fallout': '☢️', 'yugioh': '🃏', 'gta': '🔫', 'monster': '🐉',
+  'default': '🎮'
+};
+
+// ─── Parser ───────────────────────────────────────────────────────────────────
+function parseTxt(txt) {
+  const lines = txt.split('\n');
+  const games = [];
+  let current = null;
+  let psLine = '';
+
+  for (let i = 0; i < lines.length; i++) {
+    const raw = lines[i];
+    const trimmed = raw.trim();
+
+    if (trimmed.startsWith('PS:')) {
+      psLine = trimmed;
+      continue;
+    }
+
+    // Top-level entry (starts with "- " and not indented)
+    if (/^- /.test(trimmed) && !raw.startsWith('  ') && !raw.startsWith('\t')) {
+      const rest = trimmed.slice(2);
+      const urlMatch = rest.match(/^(.+?):\s*(https?:\/\/\S+)(.*)$/);
+      const noUrlMatch = rest.match(/^(.+?)(?::)?$/);
+
+      if (urlMatch) {
+        // Single-link top-level
+        const label = urlMatch[1].trim();
+        const url = urlMatch[2].trim();
+        const note = urlMatch[3].trim();
+        const { game, type } = classifyLabel(label);
+        const existing = games.find(g => g.game === game);
+        if (existing) {
+          existing.links.push({ label: getShortLabel(label, type), url, type });
+          if (note) existing.note = (existing.note ? existing.note + ' ' : '') + note;
+        } else {
+          current = { game, type: getMainType(type, label), links: [{ label: getShortLabel(label, type), url, type }], note: note || '' };
+          games.push(current);
+        }
+      } else if (noUrlMatch) {
+        // Group header (sub-items follow)
+        const label = rest.replace(/:$/, '').trim();
+        const { game } = classifyLabel(label);
+        current = { game, type: 'modpack', links: [], note: '' };
+        games.push(current);
+      }
+    } else if (/^\s{2,}/.test(raw) && trimmed.startsWith('- ')) {
+      // Sub-item
+      const rest = trimmed.slice(2);
+      const urlMatch = rest.match(/^(.+?):\s*(https?:\/\/\S+)(.*)$/);
+      if (urlMatch && current) {
+        const sublabel = urlMatch[1].trim();
+        const url = urlMatch[2].trim();
+        const { type } = classifyLabel(sublabel);
+        current.links.push({ label: sublabel, url, type });
+      }
+    } else if (/^\s{2,}/.test(raw) && trimmed && current && !trimmed.startsWith('-')) {
+      // Note line
+      if (current && !trimmed.startsWith('http')) {
+        current.note = (current.note ? current.note + ' ' : '') + trimmed;
+      }
+    }
+  }
+
+  return { games, ps: psLine };
+}
+
+function classifyLabel(label) {
+  const l = label.toLowerCase();
+  let type = 'modpack';
+  let game = label;
+
+  if (l.includes('infográfico') || l.includes('infografico') || l.includes('tabela')) type = 'infographic';
+  else if (l.includes('retextura') || l.includes('retexture')) type = 'retexture';
+  else if (l.includes('mapa') || l.includes('.psd')) type = 'map';
+  else if (l.includes('lista de mods')) type = 'list';
+  else if (l.includes('pack') || l.includes('mod')) type = 'modpack';
+
+  // Extract game name
+  const patterns = [
+    /infográfico do (.+)/i,
+    /infografico do (.+)/i,
+    /tabela de armas do (.+)/i,
+    /retextura do (.+)/i,
+    /pack de retextura do (.+)/i,
+    /pack de mods (?:do |configurados do |usados no )(.+)/i,
+    /pack (?:com|de) (.+)/i,
+    /lista de mods (?:baixados e alterações feitas do |do )(.+)/i,
+    /mod pack do (.+)/i,
+    /mod de rebalanceamento (?:de drops do |do )(.+)/i,
+    /care package do (.+)/i,
+    /mapa (.+?) \d/i,
+    /mapa (.+)/i,
+    /(.+) modificado/i,
+  ];
+
+  for (const p of patterns) {
+    const m = label.match(p);
+    if (m) { game = m[1].trim().replace(/[()]/g, '').trim(); break; }
+  }
+
+  // Normalize game names
+  game = game
+    .replace(/\bNFVS\b/i, 'NFS')
+    .replace(/^Need for Speed Most Wanted$/i, 'Need for Speed Most Wanted')
+    .replace(/^NFS 2015$/i, 'NFS 2015')
+    .replace(/\bRE5\b/i, 'Resident Evil 5')
+    .replace(/\bRE Revelations 2\b/i, 'RE Revelations 2')
+    .replace(/\bGTA IV\b/i, 'GTA IV')
+    .replace(/\bGTA SA\b/i, 'GTA SA')
+    .replace(/\bFFXII\b/i, 'Final Fantasy XII')
+    .replace(/\bFFXII\b/i, 'Final Fantasy XII')
+    .replace(/^S\.T\.A\.L\.K\.E\.R Call of (.+)/i, 'S.T.A.L.K.E.R $1')
+    .replace(/Yu-Gi-Oh!/i, 'Yu-Gi-Oh!')
+    .replace(/Monster Hunter - World/i, 'Monster Hunter World');
+
+  return { game, type };
+}
+
+function getMainType(type, label) {
+  const l = label.toLowerCase();
+  if (l.includes('mapa') || l.includes('bloodborne') && l.includes('mapa')) return 'map';
+  return type;
+}
+
+function getShortLabel(label, type) {
+  // Shorten labels for display
+  const clean = label
+    .replace(/^(?:pack de mods (?:do|usados no|configurados do)|mod pack do|retextura do|pack de retextura do|lista de mods (?:baixados e alterações feitas do|do)|mod de rebalanceamento (?:de drops do|do)|care package do|infográfico do|tabela de armas do|mapa)\s+/i, '')
+    .trim();
+
+  if (clean === label) return label; // Already short
+  return clean;
+}
+
+function getTypeLabel(type) {
+  const map = { modpack: 'Modpack', retexture: 'Retextura', infographic: 'Infográfico', map: 'Mapa', list: 'Lista' };
+  return map[type] || 'Pack';
+}
+
+function getLinkIcon(label) {
+  const l = label.toLowerCase();
+  if (l.includes('emulador')) return '🖥️';
+  if (l.includes('retextura') || l.includes('textur')) return '🎨';
+  if (l.includes('infográfico') || l.includes('infografico') || l.includes('tabela')) return '📊';
+  if (l.includes('cheat')) return '🎯';
+  if (l.includes('ptbr') || l.includes('pt)')) return '🇧🇷';
+  if (l.includes('eng') || l.includes('inglês') || l.includes('inglés')) return '🇺🇸';
+  if (l.includes('mapa') || l.includes('.psd')) return '🗺️';
+  if (l.includes('upgrade') || l.includes('upgrade')) return '⬆️';
+  if (l.includes('lista')) return '📋';
+  return '⬇️';
+}
+
+function getGameImage(game) {
+  for (const [key, url] of Object.entries(GAME_IMAGES)) {
+    if (game.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(game.toLowerCase())) {
+      return url;
+    }
+  }
+  return null;
+}
+
+function getGameEmoji(game) {
+  const l = game.toLowerCase();
+  if (l.includes('need for speed') || l.includes('gran turismo') || l.includes('nfs')) return '🏎️';
+  if (l.includes('bloodborne') || l.includes('dark souls')) return '⚔️';
+  if (l.includes('stalker')) return '☢️';
+  if (l.includes('fallout')) return '☢️';
+  if (l.includes('yu-gi-oh') || l.includes('yugioh')) return '🃏';
+  if (l.includes('gta') || l.includes('beat down')) return '🔫';
+  if (l.includes('monster hunter')) return '🐉';
+  if (l.includes('resident evil') || l.includes('deadly premonition')) return '🧟';
+  if (l.includes('final fantasy')) return '⚗️';
+  if (l.includes('god hand')) return '👊';
+  if (l.includes('sons of the forest')) return '🌲';
+  if (l.includes('borderlands')) return '🎯';
+  return '🎮';
+}
+
+// ─── Render ───────────────────────────────────────────────────────────────────
+let allCards = [];
+let currentFilter = 'all';
+
+function buildCard(entry, idx) {
+  const imgUrl = getGameImage(entry.game);
+  const emoji = getGameEmoji(entry.game);
+  const mainType = entry.links[0]?.type || entry.type || 'modpack';
+
+  const imageHtml = imgUrl
+    ? `<img class="card-image" src="${imgUrl}" alt="${entry.game}" onerror="this.parentNode.innerHTML='<div class=\\'img-placeholder\\'>${emoji}</div>'">`
+    : `<div class="img-placeholder">${emoji}</div>`;
+
+  const linksHtml = entry.links.map(link => `
+    <a class="dl-btn" href="${link.url}" target="_blank" rel="noopener">
+      <span class="icon">${getLinkIcon(link.label)}</span>
+      <span class="label">${link.label.length > 50 ? link.label.slice(0, 48) + '…' : link.label}</span>
+      <span class="arrow">→</span>
+    </a>
+  `).join('');
+
+  const noteHtml = entry.note
+    ? `<p class="card-note">${entry.note.slice(0, 120)}${entry.note.length > 120 ? '…' : ''}</p>`
+    : '';
+
+  return `
+    <div class="card" style="animation-delay:${idx * 40}ms" data-type="${mainType}" data-game="${entry.game.toLowerCase()}">
+      <div class="card-image-wrap">
+        ${imageHtml}
+        <span class="card-type-badge ${mainType}">${getTypeLabel(mainType)}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-game">${entry.game}</div>
+        ${noteHtml}
+        <div class="card-links">${linksHtml}</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderGrid(games) {
+  const grid = document.getElementById('grid');
+  allCards = games;
+  applyFilters();
+  document.getElementById('item-count').textContent = `${games.length} games`;
+  document.getElementById('loading').style.display = 'none';
+  grid.style.display = 'grid';
+}
+
+function applyFilters() {
+  const grid = document.getElementById('grid');
+  const search = document.getElementById('search').value.toLowerCase();
+
+  const filtered = allCards.filter(entry => {
+    const typeMatch = currentFilter === 'all' || (entry.links[0]?.type || entry.type) === currentFilter;
+    const searchMatch = !search || entry.game.toLowerCase().includes(search);
+    return typeMatch && searchMatch;
+  });
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="empty">Nenhum resultado encontrado</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map((e, i) => buildCard(e, i)).join('');
+}
+
+// ─── Load ─────────────────────────────────────────────────────────────────────
+async function loadData() {
+  let txt = EMBEDDED_TXT;
+
+  // Try to fetch live from Drive (works if file is public + no CORS issue)
+  try {
+    const res = await fetch(DRIVE_EXPORT_URL, { signal: AbortSignal.timeout(5000) });
+    if (res.ok) {
+      const fetchedTxt = await res.text();
+      if (fetchedTxt.includes('drive.google.com')) txt = fetchedTxt;
+    }
+  } catch (e) {
+    console.log('Using embedded data (Drive fetch blocked by CORS — expected in browser)');
+  }
+
+  const { games, ps } = parseTxt(txt);
+
+  // Merge entries with same game
+  const merged = [];
+  for (const g of games) {
+    const ex = merged.find(m => m.game.toLowerCase() === g.game.toLowerCase());
+    if (ex) {
+      ex.links.push(...g.links);
+      if (g.note) ex.note = (ex.note ? ex.note + ' ' : '') + g.note;
+    } else {
+      merged.push({ ...g });
+    }
+  }
+
+  if (ps) document.getElementById('footer-ps').textContent = ps;
+
+  renderGrid(merged);
+}
+
+// ─── Events ───────────────────────────────────────────────────────────────────
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    applyFilters();
+  });
+});
+
+document.getElementById('search').addEventListener('input', applyFilters);
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+loadData();
+</script>
+</body>
+</html>
