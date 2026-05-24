@@ -1,0 +1,65 @@
+- Need for Speed Most Wanted: https://drive.google.com/file/d/1zRjjXGG6dYGpLw_Txfp6MIPRQWsiFdn3/view?usp=sharing
+
+- Mapa Bloodborne 9000 x 10000: https://drive.google.com/file/d/1VS6cDpYdr-fAPv1wEIsReE0gaRfBZE0K/view?usp=drive_link
+- Mapa Bloodborne 4500 x 9000: https://drive.google.com/file/d/19bnXzqgcrhkOxfU3Pwb4ZxOqZY0XknRt/view?usp=drive_link
+- Mapa Bloodborne (Projeto em .psd): https://drive.google.com/file/d/1CkjUBKGNe97pvvbKpB6lhEzFm_8fmohY/view?usp=drive_link
+
+- Dark Souls: https://drive.google.com/file/d/17YYeCdUKjgXE_dg53Jn8JXSye4OAstWA/view?usp=sharing
+  - Infográfico de upgrades: https://drive.google.com/file/d/1zIgLAQAm7uTynY-dxzBx0dESU1Ioz9y2/view?usp=sharing
+
+- Need for Speed Underground 2: https://drive.google.com/file/d/11SvsBEn50X6C3QjKMr5OLgSDvNO8atSB/view?usp=sharing
+
+- Beat Down: Fists of Vengeance
+  - Pack com emulador configurado, retextura, patches e infográfico (sem .iso ou BIOS): https://drive.google.com/file/d/1mpsdPthiy5FdJ5aq3JVWaYplUtoengp1/view?usp=sharing
+  - Apenas a retextura (colocar a pasta "SLUS-21150" em "Documents\PCSX2": https://drive.google.com/file/d/1ApN0IPGlpE_xcfh6zIXVfaRB7ti1iqOC/view?usp=sharing
+  - Apenas o infográfico em inglês: https://drive.google.com/file/d/1b5XLhyGyxErsaGNSAI4-kTqVzFCXMO92/view?usp=sharing
+  - Apenas o infográfico em PTBR: https://drive.google.com/file/d/1E0RYyUSlCgVtEXQAv8cAijRrrmaxtKVV/view?usp=sharing
+  - Apenas o arquivo de cheats atualizado: https://drive.google.com/file/d/1HO2xrO_pXxs-T721UHvSSjqMOPJsxwQq/view?usp=sharing
+
+- Retextura do God Hand: https://drive.google.com/file/d/13F3xptdnGi93c99Wkk4f-YOe-px74YWB/view?usp=sharing
+  Colocar a pasta "SLUS-21503" em: "Documents\PCSX2\textures" e ativar a substituição de texturas nas configs do jogo no emulador. Alternativamente basta apertar "M" enquanto joga. 
+
+- Mod pack do Fallout New Vegas: https://drive.google.com/file/d/11Rp6Om32mX7NyPmR5ZXiTpilKcZWBFQ7/view?usp=sharing
+
+- Lista de mods baixados e alterações feitas do S.T.A.L.K.E.R Call of Pripyat: https://drive.google.com/file/d/1BCmXzkV0Finpaan34LXIEPPoAG1IhoiN/view?usp=sharing
+
+- Lista de mods baixados e alterações feitas do S.T.A.L.K.E.R Clear Sky: https://drive.google.com/file/d/1tm2TgSD64ZJRfsW3JNQEcXhq0TEDI879/view?usp=sharing
+
+- Lista de mods baixados e alterações feitas do S.T.A.L.K.E.R Call of Chernobyl: https://drive.google.com/file/d/152s0Xo5PTZEty1xd3ukf2-PhYr8p2c1s/view?usp=sharing
+
+- Lista de mods do Borderlands 3, rushado e sem tutorial mas taaí: https://drive.google.com/file/d/1pbPRuCi2NiwJ0IkBLnawQuGs1yB2JYfU/view?usp=sharing
+
+- Mod de rebalanceamento de drops do Yu-Gi-Oh! Forbidden Memories: https://drive.google.com/file/d/1I0RW04BXT3taotrPSmDdf2pp2On0kXpx/view?usp=sharing
+
+- Pack de retextura do Yu-Gi-Oh! GX Tag Force: https://drive.google.com/file/d/15CB4Drar8eYJlD2WSCrXywuvrSjFLYRr/view?usp=sharing
+
+- Pack de retextura do Yu-Gi-Oh! Capsule Monster Coliseum: https://drive.google.com/file/d/1osYGS9EWHdAZ5dXiBFW82QiCd08HU1Zh/view?usp=sharing
+
+- Mod de rebalanceamento do FFXII: https://www.nexusmods.com/finalfantasy12/mods/324
+  Apenas disponível em inglês, instruções no site. 
+
+- Pack de mods configurados do Fallout 2: https://drive.google.com/file/d/1CClCdUzQv4pRdQQwAuZZXURv0rnuueP0/view?usp=sharing
+
+- Gran Turismo 4 modificado: https://drive.google.com/file/d/18xXbKxnPoReJKwuBYT2KUtgWsa0P0sKi/view?usp=sharing
+
+- Pack de mods do Monster Hunter - World: https://drive.google.com/file/d/1x7UhSnpcjSMunPFbhbzoXOyqbpcJIK_y/view?usp=sharing	
+
+- Pack de mods usados no RE5: https://drive.google.com/file/d/1bPLdkzmrZt6Jphs8fYO7roMkSX_LfaON/view?view?usp=sharing	
+
+- Pack de mods do RE Revelations 2: https://drive.google.com/file/d/1B12EIA5cPURDRjRSHYNsJlJKO8TJQhau/view?view?usp=sharing	
+
+- Pack de mods do GTA IV (desatualizado?): https://drive.google.com/file/d/1zljSp6SnqsYGtMO7JkWO9blzZZEqxgMm/view?usp=sharing
+
+- Care Package do Deadly Premonition: https://drive.google.com/file/d/14r7iYai2BTqPba7pLJILC-vAXyl-Q3_p/view?view?usp=sharing	
+
+- Pack demods do NFS 2015: https://drive.google.com/file/d/1Ykuy4nCUF-8uPW-Ub_Gp5gOrxyKWqg6g/view?usp=sharing	
+
+- Pack de mods do GTA SA: https://drive.google.com/file/d/1nMjFCoO5_QW_yzaVMQraV2rMKKChlqlY/view?usp=sharing	
+
+- Infográfico do Sons of the Forest: https://drive.google.com/file/d/1jApMSo7lZ8Kg2O_KeBnaaLSt8NMRsyb-/view?usp=sharing	
+- Infográfico do Yugioh Capsule Monster Coliseum: https://drive.google.com/file/d/1nXJehB5T9oeQhPksM9Qz5JfHicURcKyN/view?usp=sharing
+- Infográfico do Monster Hunter World: https://drive.google.com/file/d/1a4jFwgMALxmuP9C2ewfliBZ6u_Asg1zp/view?usp=sharing	
+- Tabela de armas do RE4 Remake (ENG): https://drive.google.com/file/d/1qjbzlJdflKbTnPb13YxNh26aMWR9WyxD/view?usp=sharing	
+- Tabela de armas do RE4 Remake (PT): https://drive.google.com/file/d/1CtAFP-oNOTF8AcjrXitoAY5JVIWUVZdt/view?usp=sharing	
+
+PS: Essa lista é temporária e pode ter packs desatualizados, a ideia era só ter um lugar pra centralizar tudo q eu já deixei pra download pelas lives ao longo dos anos. 
