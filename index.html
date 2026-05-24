@@ -81,13 +81,19 @@
   }
   h1 span { color: var(--accent); }
   .header-meta {
-    margin-top: 24px;
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    font-size: 12px;
-    color: var(--muted);
-  }
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* NOVO – hover do link "txt oficial" */
+.header-meta a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
   .status-dot {
     width: 7px;
     height: 7px;
@@ -370,7 +376,7 @@
   <h1>CARE<br><span>PACKAGES</span></h1>
   <div class="header-meta">
   <span class="status-dot"></span>
-  <a href="https://drive.google.com/file/d/1mdY9ppbrtIQSj0OjOtdSkkYu-bItLn0A/view" target="_blank" rel="noopener" style="color: var(--muted); text-decoration: none; border-bottom: 1px dashed var(--border); transition: color 0.2s;">txt oficial</a>
+  <a href="https://drive.google.com/file/d/1mdY9ppbrtIQSj0OjOtdSkkYu-bItLn0A/view" target="_blank" rel="noopener" style="color: var(--muted); text-decoration: none; border-bottom: 1px dashed var(--border); transition: color 0.2s;">TXT Oficial</a>
   <span id="item-count" class="count-badge">—</span>
 </div>
 </header>
