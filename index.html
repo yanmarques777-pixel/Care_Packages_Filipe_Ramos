@@ -665,6 +665,7 @@ function getLinkIcon(label) {
   if (l.includes('eng')) return '🇺🇸';
   if (l.includes('mapa') || l.includes('.psd')) return '🗺️';
   if (l.includes('lista')) return '📋';
+  if (label === 'YT' || l.includes('youtube')) return '▶️';
   return '⬇️';
 }
 
