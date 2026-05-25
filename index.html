@@ -1,848 +1,1028 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Care Packages — Filipe Ramos</title>
-<link rel="icon" type="image/x-icon" href="assets/favicon.ico">  
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
-<style>
-  /* ========== ESTILO BASE ========== */
-  :root {
-    --bg: #0a0a0c;
-    --surface: #111116;
-    --surface2: #18181f;
-    --border: #2a2a35;
-    --accent: #e8ff47;
-    --accent2: #ff6b35;
-    --text: #e8e8f0;
-    --muted: #6b6b80;
-    --card-hover: #1c1c26;
-    --outdated: #c0392b;
-    --outdated-bg: rgba(192, 57, 43, 0.15);
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    min-height: 100vh;
-    cursor: crosshair;
-  }
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
-    opacity: 0.03;
-    pointer-events: none;
-    z-index: 9999;
-  }
-  header {
-    padding: 60px 40px 40px;
-    border-bottom: 1px solid var(--border);
-    position: relative;
-    overflow: hidden;
-  }
-  header::after {
-    content: 'CARE\APKG';
-    white-space: pre;
-    position: absolute;
-    right: -20px;
-    top: -10px;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 180px;
-    color: rgba(232,255,71,0.03);
-    line-height: 0.9;
-    pointer-events: none;
-    letter-spacing: -5px;
-  }
-  .header-tag {
-    font-size: 11px;
-    letter-spacing: 4px;
-    color: var(--accent);
-    text-transform: uppercase;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .header-tag::before {
-    content: '';
-    display: inline-block;
-    width: 20px;
-    height: 1px;
-    background: var(--accent);
-  }
-  h1 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(56px, 8vw, 110px);
-    line-height: 0.9;
-    letter-spacing: -2px;
-    color: var(--text);
-  }
-  h1 span { color: var(--accent); }
-  .header-meta {
-    margin-top: 24px;
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    font-size: 12px;
-    color: var(--muted);
-  }
-  .header-meta a:hover {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
-  }
-  .status-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--accent);
-    animation: pulse 2s infinite;
-    display: inline-block;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.7); }
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Care Packages — Filipe Ramos</title>
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
 
-  /* BLOCO DE LINKS SOCIAIS */
-  .official-links {
-    padding: 20px 40px;
-    border-bottom: 1px solid var(--border);
-    background: rgba(0,0,0,0.3);
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 24px;
-    font-size: 12px;
-    letter-spacing: 0.5px;
-  }
-  .official-links span {
-    color: var(--accent);
-    font-weight: bold;
-    margin-right: 4px;
-  }
-  .social-icon {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--muted);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-  .social-icon:hover {
-    color: var(--accent);
-  }
-  .social-icon i { font-style: normal; font-size: 18px; }
+  <style>
+    /* ─────────────────────────────────────────
+       TOKENS
+    ───────────────────────────────────────── */
+    :root {
+      --bg:          #0a0a0c;
+      --surface:     #111116;
+      --surface2:    #18181f;
+      --border:      #2a2a35;
+      --accent:      #e8ff47;
+      --accent2:     #ff6b35;
+      --text:        #e8e8f0;
+      --muted:       #6b6b80;
+      --card-hover:  #1c1c26;
+      --outdated:    #c0392b;
+      --outdated-bg: rgba(192, 57, 43, 0.15);
+    }
 
-  /* CONTROLES */
-  .controls {
-    padding: 24px 40px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-  .filter-label {
-    font-size: 11px;
-    letter-spacing: 3px;
-    color: var(--muted);
-    text-transform: uppercase;
-    margin-right: 4px;
-  }
-  .filter-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    padding: 6px 14px;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-transform: uppercase;
-  }
-  .filter-btn:hover, .filter-btn.active {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: rgba(232,255,71,0.05);
-  }
-  .search-wrap {
-    margin-left: auto;
-    position: relative;
-  }
-  .search-wrap input {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 6px 14px 6px 36px;
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    width: 220px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .search-wrap input:focus { border-color: var(--accent); }
-  .search-wrap::before {
-    content: '⌕';
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--muted);
-    font-size: 16px;
-  }
+    /* ─────────────────────────────────────────
+       RESET & BASE
+    ───────────────────────────────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-  /* GRID E CARDS */
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 1px;
-    background: var(--border);
-    border-top: 1px solid var(--border);
-  }
-  .card {
-    background: var(--surface);
-    display: flex;
-    flex-direction: column;
-    transition: background 0.2s;
-    animation: fadeUp 0.4s ease both;
-  }
-  .card:hover { background: var(--card-hover); }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .card-image {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    display: block;
-    filter: grayscale(20%) brightness(0.85);
-    transition: filter 0.3s;
-    background: var(--surface2);
-  }
-  .card:hover .card-image { filter: grayscale(0%) brightness(1); }
-  .card-image-wrap {
-    position: relative;
-    overflow: hidden;
-  }
-  .card-image-wrap::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to bottom, transparent 40%, rgba(10,10,12,0.8));
-    pointer-events: none;
-  }
-  .card-badges {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    z-index: 2;
-  }
-  .card-type-badge {
-    background: var(--accent2);
-    color: white;
-    font-size: 9px;
-    letter-spacing: 2px;
-    padding: 3px 8px;
-    text-transform: uppercase;
-    font-family: 'DM Mono', monospace;
-    border-radius: 2px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-  }
-  .card-type-badge.modpack { background: #f1c40f; color: #111; }
-  .card-type-badge.retexture { background: #9b59b6; }
-  .card-type-badge.infographic { background: #4a90d9; }
-  .card-type-badge.map { background: #27ae60; }
-  .card-type-badge.list { background: #e67e22; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      cursor: crosshair;
+    }
 
-  /* BADGE DE DESATUALIZADO (inferior) */
-  .outdated-badge {
-    position: absolute;
-    bottom: 12px;
-    left: 12px;
-    background: rgba(192, 57, 43, 0.85);
-    backdrop-filter: blur(4px);
-    color: white;
-    font-size: 8px;
-    letter-spacing: 2px;
-    padding: 3px 8px;
-    text-transform: uppercase;
-    font-family: 'DM Mono', monospace;
-    border-radius: 2px;
-    z-index: 2;
-    font-weight: bold;
-  }
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.03;
+      pointer-events: none;
+      z-index: 9999;
+    }
 
-  /* ESTILO PARA LINKS DESATUALIZADOS */
-  .dl-btn.outdated-link {
-    background: var(--outdated-bg);
-    border-color: rgba(192, 57, 43, 0.3);
-    color: var(--muted);
-  }
-  .dl-btn.outdated-link:hover {
-    border-color: var(--outdated);
-    color: var(--outdated);
-    background: rgba(192, 57, 43, 0.1);
-  }
-  .dl-btn.outdated-link .icon {
-    opacity: 0.6;
-  }
+    a { color: inherit; text-decoration: none; }
 
-  .card-body {
-    padding: 20px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-  .card-game {
-    font-family: 'Syne', sans-serif;
-    font-size: 18px;
-    font-weight: 800;
-    color: var(--text);
-    margin-bottom: 6px;
-    line-height: 1.2;
-  }
-  .card-note {
-    font-size: 11px;
-    color: var(--muted);
-    line-height: 1.6;
-    margin-bottom: 16px;
-    flex: 1;
-    font-style: italic;
-  }
-  .card-links { display: flex; flex-direction: column; gap: 6px; }
-  .dl-btn {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 9px 12px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    text-decoration: none;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.5px;
-    transition: all 0.15s;
-    cursor: pointer;
-  }
-  .dl-btn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: rgba(232,255,71,0.06);
-  }
-  .dl-btn .icon { opacity: 0.5; font-size: 13px; flex-shrink: 0; }
-  .dl-btn:hover .icon { opacity: 1; }
-  .dl-btn .label { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .dl-btn .arrow { opacity: 0; transition: opacity 0.15s, transform 0.15s; font-size: 12px; }
-  .dl-btn:hover .arrow { opacity: 1; transform: translateX(3px); }
-  .empty, .error-state {
-    grid-column: 1 / -1;
-    padding: 80px;
-    text-align: center;
-    color: var(--muted);
-    font-size: 13px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
-  .error-state { color: #ff6b6b; }
-  footer {
-    padding: 32px 40px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 1px;
-  }
-  .footer-ps { max-width: 500px; line-height: 1.7; font-style: italic; }
-  #loading {
-    padding: 100px 40px;
-    text-align: center;
-    color: var(--muted);
-    font-size: 12px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-  }
-  .loader {
-    width: 32px;
-    height: 32px;
-    border: 2px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .count-badge {
-    background: rgba(232,255,71,0.12);
-    color: var(--accent);
-    font-size: 10px;
-    padding: 2px 8px;
-    letter-spacing: 2px;
-  }
-  .img-placeholder {
-    width: 100%;
-    height: 180px;
-    background: var(--surface2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 48px;
-    user-select: none;
-  }
+    /* ─────────────────────────────────────────
+       HEADER
+    ───────────────────────────────────────── */
+    header {
+      padding: 60px 40px 40px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
 
-  /* Social icons spacing */
-  .social-icon img {
-    margin-right: 6px;
-  }
+    /* Decorative ghost text */
+    header::after {
+      content: 'CARE\APKG';
+      white-space: pre;
+      position: absolute;
+      right: -20px;
+      top: -10px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 180px;
+      color: rgba(232, 255, 71, 0.03);
+      line-height: 0.9;
+      pointer-events: none;
+      letter-spacing: -5px;
+    }
 
-  /* Botão de mute */
-  #muteButton {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    cursor: pointer;
-    font-size: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    transition: all 0.2s;
-    backdrop-filter: blur(4px);
-  }
-  #muteButton:hover {
-    background: var(--surface);
-    border-color: var(--accent);
-    transform: scale(1.05);
-  }
-</style>
+    .header-tag {
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-tag::before {
+      content: '';
+      display: inline-block;
+      width: 20px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(56px, 8vw, 110px);
+      line-height: 0.9;
+      letter-spacing: -2px;
+    }
+
+    h1 span { color: var(--accent); }
+
+    .header-meta {
+      margin-top: 24px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .header-meta a {
+      color: var(--muted);
+      border-bottom: 1px dashed var(--border);
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .header-meta a:hover {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    /* ─────────────────────────────────────────
+       SOCIAL BAR
+    ───────────────────────────────────────── */
+    .official-links {
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 24px;
+      font-size: 12px;
+    }
+
+    .official-links .brand {
+      color: var(--accent);
+      font-weight: bold;
+    }
+
+    .social-icon {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+
+    .social-icon:hover { color: var(--accent); }
+
+    .social-icon img {
+      width: 18px;
+      height: 18px;
+      vertical-align: middle;
+    }
+
+    /* ─────────────────────────────────────────
+       CONTROLS
+    ───────────────────────────────────────── */
+    .controls {
+      padding: 24px 40px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .filter-label {
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .filter-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 6px 14px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(232, 255, 71, 0.05);
+    }
+
+    .filter-btn[data-filter="outdated"] { border-color: rgba(192, 57, 43, 0.5); }
+
+    .search-wrap {
+      margin-left: auto;
+      position: relative;
+    }
+
+    .search-wrap::before {
+      content: '⌕';
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 16px;
+      pointer-events: none;
+    }
+
+    .search-wrap input {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 14px 6px 36px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      width: 220px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-wrap input:focus { border-color: var(--accent); }
+
+    /* ─────────────────────────────────────────
+       GRID & CARDS
+    ───────────────────────────────────────── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border-top: 1px solid var(--border);
+    }
+
+    .card {
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      transition: background 0.2s;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .card:hover { background: var(--card-hover); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Image area */
+    .card-image-wrap {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-image-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 40%, rgba(10, 10, 12, 0.8));
+      pointer-events: none;
+    }
+
+    .card-image {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: block;
+      filter: grayscale(20%) brightness(0.85);
+      transition: filter 0.3s;
+      background: var(--surface2);
+    }
+
+    .card:hover .card-image { filter: grayscale(0%) brightness(1); }
+
+    .img-placeholder {
+      width: 100%;
+      height: 180px;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      user-select: none;
+    }
+
+    /* Badges */
+    .card-badges {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      z-index: 2;
+    }
+
+    .badge {
+      font-size: 9px;
+      letter-spacing: 2px;
+      padding: 3px 8px;
+      text-transform: uppercase;
+      font-family: 'DM Mono', monospace;
+      border-radius: 2px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      color: #fff;
+      background: var(--accent2);
+    }
+
+    .badge.modpack     { background: #f1c40f; color: #111; }
+    .badge.retexture   { background: #9b59b6; }
+    .badge.infographic { background: #4a90d9; }
+    .badge.map         { background: #27ae60; }
+    .badge.list        { background: #e67e22; }
+
+    .outdated-badge {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      background: rgba(192, 57, 43, 0.85);
+      backdrop-filter: blur(4px);
+      color: #fff;
+      font-size: 8px;
+      letter-spacing: 2px;
+      padding: 3px 8px;
+      text-transform: uppercase;
+      font-family: 'DM Mono', monospace;
+      border-radius: 2px;
+      font-weight: bold;
+      z-index: 2;
+    }
+
+    /* Card body */
+    .card-body {
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-game {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 6px;
+      line-height: 1.2;
+    }
+
+    .card-note {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 16px;
+      flex: 1;
+      font-style: italic;
+    }
+
+    .card-links { display: flex; flex-direction: column; gap: 6px; }
+
+    .dl-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      text-decoration: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      transition: all 0.15s;
+      cursor: pointer;
+    }
+
+    .dl-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(232, 255, 71, 0.06);
+    }
+
+    .dl-btn.is-outdated {
+      background: var(--outdated-bg);
+      border-color: rgba(192, 57, 43, 0.3);
+      color: var(--muted);
+    }
+
+    .dl-btn.is-outdated:hover {
+      border-color: var(--outdated);
+      color: var(--outdated);
+      background: rgba(192, 57, 43, 0.1);
+    }
+
+    .dl-btn .icon  { opacity: 0.5; font-size: 13px; flex-shrink: 0; }
+    .dl-btn:hover .icon { opacity: 1; }
+    .dl-btn.is-outdated .icon { opacity: 0.6; }
+
+    .dl-btn .label { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .dl-btn .arrow { opacity: 0; transition: opacity 0.15s, transform 0.15s; font-size: 12px; }
+    .dl-btn:hover .arrow { opacity: 1; transform: translateX(3px); }
+
+    /* ─────────────────────────────────────────
+       STATES
+    ───────────────────────────────────────── */
+    .state-msg {
+      grid-column: 1 / -1;
+      padding: 80px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .state-msg.is-error { color: #ff6b6b; }
+
+    #loading {
+      padding: 100px 40px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .loader {
+      width: 32px;
+      height: 32px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─────────────────────────────────────────
+       FOOTER
+    ───────────────────────────────────────── */
+    footer {
+      padding: 32px 40px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    .footer-ps { max-width: 500px; line-height: 1.7; font-style: italic; }
+
+    /* ─────────────────────────────────────────
+       MISC
+    ───────────────────────────────────────── */
+    .count-badge {
+      background: rgba(232, 255, 71, 0.12);
+      color: var(--accent);
+      font-size: 10px;
+      padding: 2px 8px;
+      letter-spacing: 2px;
+    }
+
+    #mute-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9998;
+      transition: background 0.2s, border-color 0.2s, transform 0.2s;
+      backdrop-filter: blur(4px);
+    }
+
+    #mute-btn:hover {
+      background: var(--surface);
+      border-color: var(--accent);
+      transform: scale(1.05);
+    }
+  </style>
 </head>
 <body>
 
-<header>
-  <div class="header-tag">
-    <img src="assets/logo_vermelha.png" alt="Logo Filipe Ramos" style="height: 20px; width: auto; vertical-align: middle;">
-    by Filipe Ramos ·
-  </div>
-  <h1>CARE<br><span>PACKAGES</span></h1>
-  <div class="header-meta">
-    <span class="status-dot"></span>
-    <a href="https://drive.google.com/file/d/1mdY9ppbrtIQSj0OjOtdSkkYu-bItLn0A/view" target="_blank" rel="noopener" style="color: var(--muted); text-decoration: none; border-bottom: 1px dashed var(--border); transition: color 0.2s;">TXT Oficial</a>
-    <span id="item-count" class="count-badge">—</span>
-  </div>
-</header>
-
-<!-- BLOCO DE LINKS OFICIAIS -->
-<div class="official-links">
-  <span>✦ FILIPE RAMOS ✦</span>
-  <a class="social-icon" href="https://www.youtube.com/@FilipeRamos96" target="_blank" rel="noopener">
-    <img src="assets/logo_links/YouTube Principal.png" alt="YouTube" style="width: 18px; height: 18px; vertical-align: middle;">
-    YouTube Principal
-  </a>
-  <a class="social-icon" href="https://www.youtube.com/@filiperamoslives" target="_blank" rel="noopener">
-    <img src="assets/logo_links/Baú de Lives.png" alt="Baú de Lives" style="width: 18px; height: 18px; vertical-align: middle;">
-    Baú de Lives
-  </a>
-  <a class="social-icon" href="https://m.twitch.tv/filiperaaamos/home" target="_blank" rel="noopener">
-    <img src="assets/logo_links/Twitch.png" alt="Twitch" style="width: 18px; height: 18px; vertical-align: middle;">
-    Twitch
-  </a>
-  <a class="social-icon" href="https://open.spotify.com/playlist/5Q9yMHVWaUhqxtttPsZVqA?si=a08e531e826f413c" target="_blank" rel="noopener">
-    <img src="assets/logo_links/Playlist Spotify.png" alt="Spotify" style="width: 18px; height: 18px; vertical-align: middle;">
-    Playlist Spotify
-  </a>
-</div>
-
-<div class="controls">
-  <span class="filter-label">Filtrar:</span>
-  <button class="filter-btn active" data-filter="all">Todos</button>
-  <button class="filter-btn" data-filter="modpack">Modpacks</button>
-  <button class="filter-btn" data-filter="retexture">Retexturas</button>
-  <button class="filter-btn" data-filter="infographic">Infográficos</button>
-  <button class="filter-btn" data-filter="map">Mapas</button>
-  <button class="filter-btn" data-filter="list">Listas</button>
-  <button class="filter-btn" data-filter="outdated" style="border-color: rgba(192,57,43,0.5);">⚠️ Desatualizados</button>
-  <div class="search-wrap">
-    <input type="text" id="search" placeholder="Buscar jogo...">
-  </div>
-</div>
-
-<div id="loading">
-  <div class="loader"></div>
-  Carregando care packages...
-</div>
-
-<div class="grid" id="grid" style="display:none"></div>
-
-<footer>
-  <div class="footer-ps" id="footer-ps">PS: Essa lista é temporária e pode ter packs desatualizados, a ideia era só ter um lugar pra centralizar tudo q eu já deixei pra download pelas lives ao longo dos anos.</div>
-  <div>Made by Yan Marques — just a fan.</div>
-</footer>
-
-<!-- SISTEMA DE MÚSICA DE FUNDO -->
-<audio id="introMusic" src="assets/music/intro.opus" preload="auto"></audio>
-<audio id="ambientMusic" src="assets/music/musica_ambiente_01.opus" preload="auto" loop></audio>
-
-<button id="muteButton">🔊</button>
-
-<script>
-// ============================================================
-// SISTEMA DE MÚSICA
-// ============================================================
-const intro = document.getElementById('introMusic');
-const ambient = document.getElementById('ambientMusic');
-const muteBtn = document.getElementById('muteButton');
-let isMuted = false;
-let introStarted = false;
-
-intro.volume = 0.6;
-ambient.volume = 0.4;
-
-intro.addEventListener('ended', () => {
-  if (!isMuted) {
-    ambient.play().catch(e => console.log('Autoplay bloqueado:', e));
-  }
-});
-
-muteBtn.addEventListener('click', () => {
-  isMuted = !isMuted;
-  if (isMuted) {
-    intro.pause();
-    ambient.pause();
-    muteBtn.innerHTML = '🔇';
-    muteBtn.style.borderColor = 'var(--accent2)';
-  } else {
-    if (intro.currentTime < intro.duration && !intro.ended) {
-      intro.play().catch(e => console.log('Play bloqueado:', e));
-    } else if (ambient.currentTime > 0 || intro.ended) {
-      ambient.play().catch(e => console.log('Play bloqueado:', e));
-    }
-    muteBtn.innerHTML = '🔊';
-    muteBtn.style.borderColor = 'var(--border)';
-  }
-});
-
-function startMusic() {
-  if (introStarted) return;
-  introStarted = true;
-  if (!isMuted) {
-    intro.play().catch(e => {
-      console.log('Autoplay bloqueado, aguardando interação:', e);
-      document.body.addEventListener('click', startMusic, { once: true });
-    });
-  }
-}
-
-document.body.addEventListener('click', startMusic, { once: true });
-window.addEventListener('scroll', startMusic, { once: true });
-window.addEventListener('keydown', startMusic, { once: true });
-
-// ============================================================
-// CONFIGURAÇÃO - URL DO GOOGLE SHEETS CSV (PUBLICADO)
-// ============================================================
-const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnzg_Kx3G6lfQsUzCaGv2r-sA-quEirYw4YFgNF-Y5ibgYwcVM3Cb9XywtNrVgK9G9C3RThSoMmJUf/pub?output=csv';
-
-// Caminho das imagens (locais)
-const IMAGES_BASE_PATH = 'assets/images/';
-const IMAGE_EXTENSIONS = ['avif', 'jpg'];
-
-// Mapeamento de nomes de jogos para slugs de imagem
-const IMAGE_FILENAME_MAP = {
-  "Need for Speed Most Wanted": "need-for-speed-most-wanted",
-  "Bloodborne": "bloodborne",
-  "Dark Souls": "dark-souls",
-  "Need for Speed Underground 2": "need-for-speed-underground-2",
-  "Beat Down: Fists of Vengeance": "beat-down-fists-of-vengeance",
-  "God Hand": "god-hand",
-  "Fallout New Vegas": "fallout-new-vegas",
-  "S.T.A.L.K.E.R Call of Pripyat": "stalker-call-of-pripyat",
-  "S.T.A.L.K.E.R Clear Sky": "stalker-clear-sky",
-  "S.T.A.L.K.E.R Call of Chernobyl": "stalker-call-of-chernobyl",
-  "Borderlands 3": "borderlands-3",
-  "Yu-Gi-Oh! Forbidden Memories": "yugioh-forbidden-memories",
-  "Yu-Gi-Oh! GX Tag Force": "yugioh-gx-tag-force",
-  "Yu-Gi-Oh! Capsule Monster Coliseum": "yugioh-capsule-monster-coliseum",
-  "Final Fantasy XII": "final-fantasy-xii",
-  "Fallout 2": "fallout-2",
-  "Gran Turismo 4": "gran-turismo-4",
-  "Monster Hunter World": "monster-hunter-world",
-  "Resident Evil 5": "resident-evil-5",
-  "RE Revelations 2": "re-revelations-2",
-  "GTA IV": "gta-iv",
-  "Deadly Premonition": "deadly-premonition",
-  "NFS 2015": "nfs-2015",
-  "GTA SA": "gta-sa",
-  "Sons of the Forest": "sons-of-the-forest",
-  "RE4 Remake": "re4-remake"
-};
-
-// ========== FUNÇÕES AUXILIARES ==========
-function getImageBaseFilename(gameName) {
-  for (const [key, filename] of Object.entries(IMAGE_FILENAME_MAP)) {
-    if (gameName.toLowerCase() === key.toLowerCase()) return filename;
-  }
-  for (const [key, filename] of Object.entries(IMAGE_FILENAME_MAP)) {
-    if (gameName.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(gameName.toLowerCase())) return filename;
-  }
-  return gameName.toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^\w\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '');
-}
-
-function getPictureHtml(gameName, emoji, isOutdated) {
-  const baseFilename = getImageBaseFilename(gameName);
-  const sourcesHtml = IMAGE_EXTENSIONS.map(ext => {
-    const mime = ext === 'avif' ? 'image/avif' : 'image/jpeg';
-    return `<source srcset="${IMAGES_BASE_PATH}${baseFilename}.${ext}" type="${mime}">`;
-  }).join('');
-  const fallbackSrc = `${IMAGES_BASE_PATH}${baseFilename}.${IMAGE_EXTENSIONS[IMAGE_EXTENSIONS.length-1]}`;
-  
-  // Adiciona badge de desatualizado se necessário
-  const outdatedBadgeHtml = isOutdated ? '<div class="outdated-badge">⚠️ DESATUALIZADO</div>' : '';
-  
-  return `
-    <picture>
-      ${sourcesHtml}
-      <img class="card-image" src="${fallbackSrc}" alt="${gameName}" loading="lazy"
-           onerror="this.onerror=null; this.parentNode.parentNode.innerHTML='<div class=\\'img-placeholder\\'>${emoji}</div>';">
-    </picture>
-    ${outdatedBadgeHtml}
-  `;
-}
-
-function getGameEmoji(game) {
-  const l = game.toLowerCase();
-  if (l.includes('need for speed') || l.includes('gran turismo') || l.includes('nfs')) return '🏎️';
-  if (l.includes('bloodborne') || l.includes('dark souls')) return '⚔️';
-  if (l.includes('stalker')) return '☢️';
-  if (l.includes('fallout')) return '☢️';
-  if (l.includes('yu-gi-oh') || l.includes('yugioh')) return '🃏';
-  if (l.includes('gta') || l.includes('beat down')) return '🔫';
-  if (l.includes('monster hunter')) return '🐉';
-  if (l.includes('resident evil') || l.includes('deadly premonition')) return '🧟';
-  if (l.includes('final fantasy')) return '⚗️';
-  if (l.includes('god hand')) return '👊';
-  if (l.includes('sons of the forest')) return '🌲';
-  if (l.includes('borderlands')) return '🎯';
-  return '🎮';
-}
-
-function getTypeLabel(type) {
-  const map = { modpack: 'Modpack', retexture: 'Retextura', infographic: 'Infográfico', map: 'Mapa', list: 'Lista' };
-  return map[type] || 'Pack';
-}
-
-function getLinkIcon(label) {
-  const l = label.toLowerCase();
-  if (l.includes('emulador')) return '🖥️';
-  if (l.includes('retextura') || l.includes('textur')) return '🎨';
-  if (l.includes('infográfico') || l.includes('infografico') || l.includes('tabela')) return '📊';
-  if (l.includes('cheat')) return '🎯';
-  if (l.includes('ptbr')) return '🇧🇷';
-  if (l.includes('eng')) return '🇺🇸';
-  if (l.includes('mapa') || l.includes('.psd')) return '🗺️';
-  if (l.includes('lista')) return '📋';
-  return '⬇️';
-}
-
-function escapeHtml(str) {
-  return str.replace(/[&<>]/g, function(m) {
-    if (m === '&') return '&amp;';
-    if (m === '<') return '&lt;';
-    if (m === '>') return '&gt;';
-    return m;
-  });
-}
-
-// ========== PROCESSAR CSV (COM STATUS) ==========
-async function fetchSheetData() {
-  const response = await fetch(GOOGLE_SHEETS_CSV_URL);
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  const csvText = await response.text();
-  const lines = csvText.split(/\r?\n/);
-  const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-  
-  const idxGame = headers.indexOf('game');
-  const idxType = headers.indexOf('type');
-  const idxLabel = headers.indexOf('link_label');
-  const idxUrl = headers.indexOf('link_url');
-  const idxNote = headers.indexOf('note');
-  const idxStatus = headers.indexOf('status');
-  
-  if (idxGame === -1 || idxType === -1 || idxLabel === -1 || idxUrl === -1) {
-    throw new Error('Colunas obrigatórias não encontradas');
-  }
-  
-  const gamesMap = new Map();
-  
-  for (let i = 1; i < lines.length; i++) {
-    if (!lines[i].trim()) continue;
-    const row = lines[i].split(',').map(cell => cell.trim().replace(/^"|"$/g, ''));
-    const game = row[idxGame];
-    if (!game) continue;
-    const type = (row[idxType] || 'modpack').toLowerCase();
-    const linkLabel = row[idxLabel];
-    const linkUrl = row[idxUrl];
-    const note = row[idxNote] || '';
-    const status = idxStatus !== -1 ? (row[idxStatus] || 'atualizado').toLowerCase() : 'atualizado';
-    
-    const key = game.toLowerCase();
-    if (!gamesMap.has(key)) {
-      gamesMap.set(key, {
-        game: game,
-        types: new Set(),
-        links: [],
-        note: '',
-        hasOutdated: false
-      });
-    }
-    const entry = gamesMap.get(key);
-    if (linkLabel && linkUrl) {
-      const isOutdated = status === 'desatualizado';
-      entry.links.push({ label: linkLabel, url: linkUrl, type: type, isOutdated: isOutdated });
-      entry.types.add(type);
-      if (isOutdated) entry.hasOutdated = true;
-    }
-    if (note && !entry.note) entry.note = note;
-    else if (note) entry.note += ' ' + note;
-  }
-  
-  return Array.from(gamesMap.values()).map(entry => ({
-    ...entry,
-    typesArray: Array.from(entry.types)
-  }));
-}
-
-// ========== RENDERIZAÇÃO ==========
-let allCards = [];
-let currentFilter = 'all';
-
-function buildCard(entry, idx) {
-  const emoji = getGameEmoji(entry.game);
-  const imageHtml = getPictureHtml(entry.game, emoji, entry.hasOutdated);
-  const badgesHtml = entry.typesArray.map(type => 
-    `<span class="card-type-badge ${type}">${getTypeLabel(type)}</span>`
-  ).join('');
-  
-  const linksHtml = entry.links.map(link => {
-    const outdatedClass = link.isOutdated ? 'outdated-link' : '';
-    const outdatedIcon = link.isOutdated ? '⚠️ ' : '';
-    return `
-      <a class="dl-btn ${outdatedClass}" href="${link.url}" target="_blank" rel="noopener">
-        <span class="icon">${outdatedIcon}${getLinkIcon(link.label)}</span>
-        <span class="label">${link.label.length > 50 ? link.label.slice(0, 48) + '…' : link.label}</span>
-        <span class="arrow">→</span>
-      </a>
-    `;
-  }).join('');
-  
-  const noteHtml = entry.note ? `<p class="card-note">${escapeHtml(entry.note.slice(0, 120))}${entry.note.length > 120 ? '…' : ''}</p>` : '';
-  
-  return `
-    <div class="card" style="animation-delay:${idx * 40}ms" data-types="${entry.typesArray.join(',')}" data-game="${entry.game.toLowerCase()}">
-      <div class="card-image-wrap">
-        ${imageHtml}
-        <div class="card-badges">${badgesHtml}</div>
-      </div>
-      <div class="card-body">
-        <div class="card-game">${escapeHtml(entry.game)}</div>
-        ${noteHtml}
-        <div class="card-links">${linksHtml}</div>
-      </div>
+  <!-- ═══════════════ HEADER ═══════════════ -->
+  <header>
+    <div class="header-tag">
+      <img src="assets/logo_vermelha.png" alt="Logo Filipe Ramos" style="height:20px;width:auto;vertical-align:middle;">
+      by Filipe Ramos ·
     </div>
-  `;
-}
+    <h1>CARE<br><span>PACKAGES</span></h1>
+    <div class="header-meta">
+      <span class="status-dot" aria-hidden="true"></span>
+      <a href="https://drive.google.com/file/d/1mdY9ppbrtIQSj0OjOtdSkkYu-bItLn0A/view" target="_blank" rel="noopener">TXT Oficial</a>
+      <span id="item-count" class="count-badge" aria-live="polite">—</span>
+    </div>
+  </header>
 
-function applyFilters() {
-  const grid = document.getElementById('grid');
-  const search = document.getElementById('search').value.toLowerCase();
-  
-  console.log('Filtro atual:', currentFilter); // Debug
-  console.log('Total de cards:', allCards.length); // Debug
-  console.log('Cards com outdated:', allCards.filter(c => c.hasOutdated === true).length); // Debug
-  
-  const filtered = allCards.filter(entry => {
-    // Filtro por tipo
-    let typeMatch = true;
-    if (currentFilter === 'all') {
-      typeMatch = true;
-    } else if (currentFilter === 'outdated') {
-      // Filtro especial: mostra apenas jogos com link desatualizado
-      typeMatch = entry.hasOutdated === true;
-      if (typeMatch) console.log('Card incluído no filtro outdated:', entry.game); // Debug
-    } else {
-      typeMatch = entry.typesArray.includes(currentFilter);
+  <!-- ═══════════════ SOCIAL BAR ═══════════════ -->
+  <nav class="official-links" aria-label="Links oficiais">
+    <span class="brand">✦ FILIPE RAMOS ✦</span>
+
+    <a class="social-icon" href="https://www.youtube.com/@FilipeRamos96" target="_blank" rel="noopener">
+      <img src="assets/logo_links/YouTube Principal.png" alt="">YouTube Principal
+    </a>
+    <a class="social-icon" href="https://www.youtube.com/@filiperamoslives" target="_blank" rel="noopener">
+      <img src="assets/logo_links/Baú de Lives.png" alt="">Baú de Lives
+    </a>
+    <a class="social-icon" href="https://m.twitch.tv/filiperaaamos/home" target="_blank" rel="noopener">
+      <img src="assets/logo_links/Twitch.png" alt="">Twitch
+    </a>
+    <a class="social-icon" href="https://open.spotify.com/playlist/5Q9yMHVWaUhqxtttPsZVqA?si=a08e531e826f413c" target="_blank" rel="noopener">
+      <img src="assets/logo_links/Playlist Spotify.png" alt="">Playlist Spotify
+    </a>
+  </nav>
+
+  <!-- ═══════════════ CONTROLES ═══════════════ -->
+  <div class="controls" role="toolbar" aria-label="Filtros">
+    <span class="filter-label">Filtrar:</span>
+    <button type="button" class="filter-btn active" data-filter="all">Todos</button>
+    <button type="button" class="filter-btn" data-filter="modpack">Modpacks</button>
+    <button type="button" class="filter-btn" data-filter="retexture">Retexturas</button>
+    <button type="button" class="filter-btn" data-filter="infographic">Infográficos</button>
+    <button type="button" class="filter-btn" data-filter="map">Mapas</button>
+    <button type="button" class="filter-btn" data-filter="list">Listas</button>
+    <button type="button" class="filter-btn" data-filter="outdated">⚠️ Desatualizados</button>
+
+    <div class="search-wrap">
+      <input type="search" id="search" placeholder="Buscar jogo..." aria-label="Buscar jogo">
+    </div>
+  </div>
+
+  <!-- ═══════════════ CONTEÚDO ═══════════════ -->
+  <div id="loading" role="status" aria-live="polite">
+    <div class="loader" aria-hidden="true"></div>
+    Carregando care packages...
+  </div>
+
+  <main class="grid" id="grid" style="display:none" aria-label="Lista de care packages"></main>
+
+  <!-- ═══════════════ FOOTER ═══════════════ -->
+  <footer>
+    <p class="footer-ps">
+      PS: Essa lista é temporária e pode ter packs desatualizados, a ideia era só ter um lugar pra
+      centralizar tudo q eu já deixei pra download pelas lives ao longo dos anos.
+    </p>
+    <span>Made by Yan Marques — just a fan.</span>
+  </footer>
+
+  <!-- ═══════════════ ÁUDIO ═══════════════ -->
+  <audio id="intro-music"   src="assets/music/intro.opus"              preload="auto"></audio>
+  <audio id="ambient-music" src="assets/music/musica_ambiente_01.opus" preload="auto" loop></audio>
+
+  <button type="button" id="mute-btn" aria-label="Alternar áudio">🔊</button>
+
+  <!-- ═══════════════ SCRIPTS ═══════════════ -->
+  <script>
+  'use strict';
+
+  /* ═══════════════════════════════════════════════════════
+     CONFIG
+  ═══════════════════════════════════════════════════════ */
+  const CONFIG = {
+    sheetCsvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnzg_Kx3G6lfQsUzCaGv2r-sA-quEirYw4YFgNF-Y5ibgYwcVM3Cb9XywtNrVgK9G9C3RThSoMmJUf/pub?output=csv',
+    imagesPath: 'assets/images/',
+    imageExtensions: ['avif', 'jpg'],
+    noteMaxLength: 120,
+    cardAnimationStep: 40, // ms per card
+  };
+
+  /** Mapeamento de nome do jogo → slug da imagem */
+  const IMAGE_SLUG_MAP = {
+    'Need for Speed Most Wanted':       'need-for-speed-most-wanted',
+    'Bloodborne':                       'bloodborne',
+    'Dark Souls':                       'dark-souls',
+    'Need for Speed Underground 2':     'need-for-speed-underground-2',
+    'Beat Down: Fists of Vengeance':    'beat-down-fists-of-vengeance',
+    'God Hand':                         'god-hand',
+    'Fallout New Vegas':                'fallout-new-vegas',
+    'S.T.A.L.K.E.R Call of Pripyat':   'stalker-call-of-pripyat',
+    'S.T.A.L.K.E.R Clear Sky':         'stalker-clear-sky',
+    'S.T.A.L.K.E.R Call of Chernobyl': 'stalker-call-of-chernobyl',
+    'Borderlands 3':                    'borderlands-3',
+    'Yu-Gi-Oh! Forbidden Memories':     'yugioh-forbidden-memories',
+    'Yu-Gi-Oh! GX Tag Force':           'yugioh-gx-tag-force',
+    'Yu-Gi-Oh! Capsule Monster Coliseum': 'yugioh-capsule-monster-coliseum',
+    'Final Fantasy XII':                'final-fantasy-xii',
+    'Fallout 2':                        'fallout-2',
+    'Gran Turismo 4':                   'gran-turismo-4',
+    'Monster Hunter World':             'monster-hunter-world',
+    'Resident Evil 5':                  'resident-evil-5',
+    'RE Revelations 2':                 're-revelations-2',
+    'GTA IV':                           'gta-iv',
+    'Deadly Premonition':               'deadly-premonition',
+    'NFS 2015':                         'nfs-2015',
+    'GTA SA':                           'gta-sa',
+    'Sons of the Forest':               'sons-of-the-forest',
+    'RE4 Remake':                       're4-remake',
+  };
+
+  /** Tipos e suas labels em PT-BR */
+  const TYPE_LABELS = {
+    modpack:     'Modpack',
+    retexture:   'Retextura',
+    infographic: 'Infográfico',
+    map:         'Mapa',
+    list:        'Lista',
+  };
+
+  /* ═══════════════════════════════════════════════════════
+     UTILS
+  ═══════════════════════════════════════════════════════ */
+
+  /** Escapa caracteres HTML para evitar XSS */
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, ch => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+    }[ch]));
+  }
+
+  /** Converte nome do jogo em slug de imagem */
+  function gameToSlug(name) {
+    // Busca exata (case-insensitive)
+    const exactKey = Object.keys(IMAGE_SLUG_MAP).find(
+      k => k.toLowerCase() === name.toLowerCase()
+    );
+    if (exactKey) return IMAGE_SLUG_MAP[exactKey];
+
+    // Busca parcial
+    const partialKey = Object.keys(IMAGE_SLUG_MAP).find(
+      k => name.toLowerCase().includes(k.toLowerCase()) ||
+           k.toLowerCase().includes(name.toLowerCase())
+    );
+    if (partialKey) return IMAGE_SLUG_MAP[partialKey];
+
+    // Fallback: gera slug a partir do nome
+    return name
+      .toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+  }
+
+  /** Emoji temático por nome de jogo */
+  function gameEmoji(name) {
+    const l = name.toLowerCase();
+    if (/need for speed|gran turismo|nfs/.test(l))        return '🏎️';
+    if (/bloodborne|dark souls/.test(l))                  return '⚔️';
+    if (/stalker/.test(l))                                return '☢️';
+    if (/fallout/.test(l))                                return '☢️';
+    if (/yu-gi-oh|yugioh/.test(l))                        return '🃏';
+    if (/gta|beat down/.test(l))                          return '🔫';
+    if (/monster hunter/.test(l))                         return '🐉';
+    if (/resident evil|deadly premonition/.test(l))       return '🧟';
+    if (/final fantasy/.test(l))                          return '⚗️';
+    if (/god hand/.test(l))                               return '👊';
+    if (/sons of the forest/.test(l))                     return '🌲';
+    if (/borderlands/.test(l))                            return '🎯';
+    return '🎮';
+  }
+
+  /** Ícone por label do link */
+  function linkIcon(label) {
+    const l = label.toLowerCase();
+    if (/emulador/.test(l))                              return '🖥️';
+    if (/retextura|textur/.test(l))                      return '🎨';
+    if (/infográfico|infografico|tabela/.test(l))        return '📊';
+    if (/cheat/.test(l))                                 return '🎯';
+    if (/ptbr/.test(l))                                  return '🇧🇷';
+    if (/eng/.test(l))                                   return '🇺🇸';
+    if (/mapa|\.psd/.test(l))                            return '🗺️';
+    if (/lista/.test(l))                                 return '📋';
+    return '⬇️';
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     CSV PARSER (robusto — respeita aspas e vírgulas internas)
+  ═══════════════════════════════════════════════════════ */
+
+  /**
+   * Divide uma linha CSV respeitando campos entre aspas duplas.
+   * Resolve o bug original onde vírgulas dentro de aspas quebravam
+   * os campos incorretamente.
+   */
+  function parseCSVLine(line) {
+    const fields = [];
+    let current = '';
+    let inQuotes = false;
+
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+
+      if (ch === '"') {
+        // Aspas duplas escapadas dentro de campo: ""
+        if (inQuotes && line[i + 1] === '"') {
+          current += '"';
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (ch === ',' && !inQuotes) {
+        fields.push(current.trim());
+        current = '';
+      } else {
+        current += ch;
+      }
     }
-    
-    const searchMatch = !search || entry.game.toLowerCase().includes(search);
-    return typeMatch && searchMatch;
-  });
-  
-  console.log('Filtrados encontrados:', filtered.length); // Debug
-  
-  if (filtered.length === 0) {
-    grid.innerHTML = '<div class="empty">Nenhum resultado encontrado</div>';
-    return;
-  }
-  grid.innerHTML = filtered.map((e, i) => buildCard(e, i)).join('');
-}
 
-// ========== CARREGAR DADOS ==========
-async function loadData() {
-  const loadingDiv = document.getElementById('loading');
-  const gridDiv = document.getElementById('grid');
-  try {
-    const games = await fetchSheetData();
-    allCards = games;
-    document.getElementById('item-count').textContent = `${games.length} games`;
-    loadingDiv.style.display = 'none';
-    gridDiv.style.display = 'grid';
-    applyFilters();
-  } catch (err) {
-    console.error(err);
-    loadingDiv.style.display = 'none';
-    gridDiv.style.display = 'grid';
-    gridDiv.innerHTML = `<div class="empty error-state">
-      ⚠️ Erro ao carregar dados do Google Sheets.<br>
-      Verifique se a URL do CSV está correta e se a planilha está publicada.
-    </div>`;
+    fields.push(current.trim());
+    return fields;
   }
-}
-// ========== EVENTOS ==========
-document.querySelectorAll('.filter-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentFilter = btn.dataset.filter;
+
+  /** Processa o CSV completo e retorna array de entradas agrupadas por jogo */
+  function parseSheetCSV(csvText) {
+    const lines = csvText.split(/\r?\n/);
+    if (lines.length < 2) return [];
+
+    const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase());
+    const col = name => headers.indexOf(name);
+
+    const idxGame   = col('game');
+    const idxType   = col('type');
+    const idxLabel  = col('link_label');
+    const idxUrl    = col('link_url');
+    const idxNote   = col('note');
+    const idxStatus = col('status');
+
+    if (idxGame === -1 || idxType === -1 || idxLabel === -1 || idxUrl === -1) {
+      throw new Error('Colunas obrigatórias não encontradas no CSV (game, type, link_label, link_url).');
+    }
+
+    const gamesMap = new Map();
+
+    for (let i = 1; i < lines.length; i++) {
+      if (!lines[i].trim()) continue;
+
+      const row   = parseCSVLine(lines[i]);
+      const game  = (row[idxGame] || '').trim();
+      if (!game) continue;
+
+      const type       = (row[idxType]   || 'modpack').toLowerCase();
+      const linkLabel  = (row[idxLabel]  || '').trim();
+      const linkUrl    = (row[idxUrl]    || '').trim();
+      const note       = (row[idxNote]   || '').trim();
+      const isOutdated = idxStatus !== -1
+        ? (row[idxStatus] || '').trim().toLowerCase() === 'desatualizado'
+        : false;
+
+      const key = game.toLowerCase();
+
+      if (!gamesMap.has(key)) {
+        gamesMap.set(key, { game, types: new Set(), links: [], notes: [], hasOutdated: false });
+      }
+
+      const entry = gamesMap.get(key);
+
+      if (linkLabel && linkUrl) {
+        entry.links.push({ label: linkLabel, url: linkUrl, type, isOutdated });
+        entry.types.add(type);
+        if (isOutdated) entry.hasOutdated = true;
+      }
+
+      if (note) entry.notes.push(note);
+    }
+
+    return Array.from(gamesMap.values()).map(entry => ({
+      ...entry,
+      typesArray: Array.from(entry.types),
+      note: [...new Set(entry.notes)].join(' '), // deduplica notas
+    }));
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     TEMPLATES HTML
+  ═══════════════════════════════════════════════════════ */
+
+  function renderImageArea(game, isOutdated) {
+    const slug     = gameToSlug(game);
+    const emoji    = gameEmoji(game);
+    const sources  = CONFIG.imageExtensions.map(ext => {
+      const mime = ext === 'avif' ? 'image/avif' : 'image/jpeg';
+      return `<source srcset="${CONFIG.imagesPath}${slug}.${ext}" type="${mime}">`;
+    }).join('');
+    const fallback = `${CONFIG.imagesPath}${slug}.${CONFIG.imageExtensions.at(-1)}`;
+
+    // Ao falhar, substitui todo o <picture> pelo placeholder de emoji
+    const onError = `this.onerror=null;this.closest('.card-image-wrap').querySelector('picture').outerHTML='<div class="img-placeholder">${emoji}</div>'`;
+
+    return `
+      <picture>
+        ${sources}
+        <img class="card-image" src="${escapeHtml(fallback)}" alt="${escapeHtml(game)}" loading="lazy" onerror="${onError}">
+      </picture>
+      ${isOutdated ? '<div class="outdated-badge">⚠️ Desatualizado</div>' : ''}
+    `;
+  }
+
+  function renderBadges(typesArray) {
+    return typesArray.map(type =>
+      `<span class="badge ${type}">${TYPE_LABELS[type] || 'Pack'}</span>`
+    ).join('');
+  }
+
+  function renderLinks(links) {
+    return links.map(({ label, url, isOutdated }) => {
+      const safeLabel = escapeHtml(label.length > 50 ? label.slice(0, 48) + '…' : label);
+      const safeUrl   = escapeHtml(url);
+      const icon      = isOutdated ? '⚠️' : linkIcon(label);
+      const cls       = isOutdated ? 'dl-btn is-outdated' : 'dl-btn';
+
+      return `
+        <a class="${cls}" href="${safeUrl}" target="_blank" rel="noopener noreferrer">
+          <span class="icon" aria-hidden="true">${icon}</span>
+          <span class="label">${safeLabel}</span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      `;
+    }).join('');
+  }
+
+  function renderCard(entry, idx) {
+    const { game, typesArray, links, note, hasOutdated } = entry;
+    const truncatedNote = note.length > CONFIG.noteMaxLength
+      ? note.slice(0, CONFIG.noteMaxLength) + '…'
+      : note;
+
+    return `
+      <article
+        class="card"
+        style="animation-delay:${idx * CONFIG.cardAnimationStep}ms"
+        data-types="${typesArray.join(',')}"
+        data-game="${game.toLowerCase()}"
+        data-outdated="${hasOutdated}"
+      >
+        <div class="card-image-wrap">
+          ${renderImageArea(game, hasOutdated)}
+          <div class="card-badges">${renderBadges(typesArray)}</div>
+        </div>
+        <div class="card-body">
+          <div class="card-game">${escapeHtml(game)}</div>
+          ${note ? `<p class="card-note">${escapeHtml(truncatedNote)}</p>` : ''}
+          <div class="card-links">${renderLinks(links)}</div>
+        </div>
+      </article>
+    `;
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     ESTADO DA APLICAÇÃO
+  ═══════════════════════════════════════════════════════ */
+  const state = {
+    cards: [],
+    filter: 'all',
+    search: '',
+  };
+
+  /* ═══════════════════════════════════════════════════════
+     RENDERIZAÇÃO
+  ═══════════════════════════════════════════════════════ */
+  function applyFilters() {
+    const grid   = document.getElementById('grid');
+    const search = state.search;
+
+    const filtered = state.cards.filter(entry => {
+      const typeMatch = (() => {
+        if (state.filter === 'all')      return true;
+        if (state.filter === 'outdated') return entry.hasOutdated;
+        return entry.typesArray.includes(state.filter);
+      })();
+
+      const searchMatch = !search || entry.game.toLowerCase().includes(search);
+      return typeMatch && searchMatch;
+    });
+
+    if (filtered.length === 0) {
+      grid.innerHTML = '<p class="state-msg">Nenhum resultado encontrado.</p>';
+      return;
+    }
+
+    grid.innerHTML = filtered.map((entry, i) => renderCard(entry, i)).join('');
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     CARREGAMENTO DE DADOS
+  ═══════════════════════════════════════════════════════ */
+  async function loadData() {
+    const loading = document.getElementById('loading');
+    const grid    = document.getElementById('grid');
+
+    try {
+      const response = await fetch(CONFIG.sheetCsvUrl);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      const csvText = await response.text();
+      state.cards   = parseSheetCSV(csvText);
+
+      document.getElementById('item-count').textContent = `${state.cards.length} games`;
+      loading.style.display = 'none';
+      grid.style.display    = 'grid';
+      applyFilters();
+
+    } catch (err) {
+      loading.style.display = 'none';
+      grid.style.display    = 'grid';
+      grid.innerHTML = `
+        <p class="state-msg is-error">
+          ⚠️ Erro ao carregar dados do Google Sheets.<br>
+          Verifique se a planilha está publicada corretamente.<br>
+          <small style="opacity:.6">${escapeHtml(err.message)}</small>
+        </p>
+      `;
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     EVENTOS — FILTROS & BUSCA
+  ═══════════════════════════════════════════════════════ */
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.filter = btn.dataset.filter;
+      applyFilters();
+    });
+  });
+
+  document.getElementById('search').addEventListener('input', e => {
+    state.search = e.target.value.toLowerCase().trim();
     applyFilters();
   });
-});
-document.getElementById('search').addEventListener('input', applyFilters);
 
-loadData();
-</script>
+  /* ═══════════════════════════════════════════════════════
+     SISTEMA DE ÁUDIO
+  ═══════════════════════════════════════════════════════ */
+  (function initAudio() {
+    const intro   = document.getElementById('intro-music');
+    const ambient = document.getElementById('ambient-music');
+    const muteBtn = document.getElementById('mute-btn');
+
+    intro.volume   = 0.6;
+    ambient.volume = 0.4;
+
+    let muted        = false;
+    let musicStarted = false;
+
+    // Quando a intro termina, toca o ambiente
+    intro.addEventListener('ended', () => {
+      if (!muted) ambient.play().catch(() => {});
+    });
+
+    // Inicia a intro na primeira interação do usuário (política de autoplay)
+    function startMusic() {
+      if (musicStarted) return;
+      musicStarted = true;
+      if (!muted) intro.play().catch(() => {});
+    }
+
+    ['click', 'scroll', 'keydown'].forEach(ev =>
+      window.addEventListener(ev, startMusic, { once: true, passive: true })
+    );
+
+    // Botão de mute
+    muteBtn.addEventListener('click', () => {
+      muted = !muted;
+
+      if (muted) {
+        intro.pause();
+        ambient.pause();
+        muteBtn.textContent          = '🔇';
+        muteBtn.style.borderColor    = 'var(--accent2)';
+        muteBtn.setAttribute('aria-label', 'Ativar áudio');
+      } else {
+        const resumeAmbient = intro.ended || intro.currentTime === 0;
+        (resumeAmbient ? ambient : intro).play().catch(() => {});
+        muteBtn.textContent          = '🔊';
+        muteBtn.style.borderColor    = 'var(--border)';
+        muteBtn.setAttribute('aria-label', 'Silenciar áudio');
+      }
+    });
+  })();
+
+  /* ═══════════════════════════════════════════════════════
+     INICIALIZAÇÃO
+  ═══════════════════════════════════════════════════════ */
+  loadData();
+  </script>
 </body>
 </html>
