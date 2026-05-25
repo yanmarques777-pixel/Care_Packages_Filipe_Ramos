@@ -340,7 +340,7 @@
     .outdated-badge {
       position: absolute;
       bottom: 12px;
-      right: 12px;
+      left: 12px;
       background: rgba(192, 57, 43, 0.85);
       backdrop-filter: blur(4px);
       color: #fff;
@@ -404,13 +404,13 @@
       background: rgba(232, 255, 71, 0.06);
     }
 
-    .dl-btn.is-outdated {
+    .dl-btn.outdated-link {
       background: var(--outdated-bg);
       border-color: rgba(192, 57, 43, 0.3);
       color: var(--muted);
     }
 
-    .dl-btn.is-outdated:hover {
+    .dl-btn.outdated-link:hover {
       border-color: var(--outdated);
       color: var(--outdated);
       background: rgba(192, 57, 43, 0.1);
@@ -418,7 +418,7 @@
 
     .dl-btn .icon  { opacity: 0.5; font-size: 13px; flex-shrink: 0; }
     .dl-btn:hover .icon { opacity: 1; }
-    .dl-btn.is-outdated .icon { opacity: 0.6; }
+    .dl-btn.outdated-link .icon { opacity: 0.6; }
 
     .dl-btn .label { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
@@ -846,7 +846,7 @@
       const safeLabel = escapeHtml(label.length > 50 ? label.slice(0, 48) + '…' : label);
       const safeUrl   = escapeHtml(url);
       const icon      = isOutdated ? '⚠️' : linkIcon(label);
-      const cls       = isOutdated ? 'dl-btn is-outdated' : 'dl-btn';
+      const cls       = isOutdated ? 'dl-btn outdated-link' : 'dl-btn';
 
       return `
         <a class="${cls}" href="${safeUrl}" target="_blank" rel="noopener noreferrer">
