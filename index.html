@@ -170,12 +170,6 @@
     color: var(--accent);
     background: rgba(232,255,71,0.05);
   }
-  .filter-btn[data-filter="outdated"]:hover,
-  .filter-btn[data-filter="outdated"].active {
-    border-color: #c0392b;
-    color: #c0392b;
-    background: rgba(192, 57, 43, 0.1);
-  }
   .search-wrap {
     margin-left: auto;
     position: relative;
@@ -603,19 +597,7 @@ const IMAGE_FILENAME_MAP = {
 };
 
 // ========== FUNÇÕES AUXILIARES ==========
-function isValidUrl(url) {
-  if (!url) return false;
-  if (typeof url !== 'string') return false;
-  // Só aceita URLs que começam com http:// ou https://
-  return url.startsWith('http://') || url.startsWith('https://');
-}
-
 function getImageBaseFilename(gameName) {
-  // FORÇA O SLUG CORRETO PARA BEAT DOWN
-  if (gameName.toLowerCase().includes('beat down')) {
-    return 'beat-down-fists-of-vengeance';
-  }
-  
   for (const [key, filename] of Object.entries(IMAGE_FILENAME_MAP)) {
     if (gameName.toLowerCase() === key.toLowerCase()) return filename;
   }
@@ -630,7 +612,7 @@ function getImageBaseFilename(gameName) {
     .replace(/^-|-$/g, '');
 }
 
-function getPictureHtml(gameName, emoji, hasOutdated) {
+function getPictureHtml(gameName, emoji, isOutdated) {
   const baseFilename = getImageBaseFilename(gameName);
   const sourcesHtml = IMAGE_EXTENSIONS.map(ext => {
     const mime = ext === 'avif' ? 'image/avif' : 'image/jpeg';
@@ -638,13 +620,14 @@ function getPictureHtml(gameName, emoji, hasOutdated) {
   }).join('');
   const fallbackSrc = `${IMAGES_BASE_PATH}${baseFilename}.${IMAGE_EXTENSIONS[IMAGE_EXTENSIONS.length-1]}`;
   
-  const outdatedBadgeHtml = hasOutdated ? '<div class="outdated-badge">⚠️ DESATUALIZADO</div>' : '';
+  // Adiciona badge de desatualizado se necessário
+  const outdatedBadgeHtml = isOutdated ? '<div class="outdated-badge">⚠️ DESATUALIZADO</div>' : '';
   
   return `
     <picture>
       ${sourcesHtml}
       <img class="card-image" src="${fallbackSrc}" alt="${gameName}" loading="lazy"
-           onerror="this.onerror=null; this.src=''; this.parentNode.parentNode.innerHTML='<div class=\\'img-placeholder\\'>${emoji}</div>';">
+           onerror="this.onerror=null; this.parentNode.parentNode.innerHTML='<div class=\\'img-placeholder\\'>${emoji}</div>';">
     </picture>
     ${outdatedBadgeHtml}
   `;
@@ -686,7 +669,6 @@ function getLinkIcon(label) {
 }
 
 function escapeHtml(str) {
-  if (!str) return '';
   return str.replace(/[&<>]/g, function(m) {
     if (m === '&') return '&amp;';
     if (m === '<') return '&lt;';
@@ -723,22 +705,9 @@ async function fetchSheetData() {
     if (!game) continue;
     const type = (row[idxType] || 'modpack').toLowerCase();
     const linkLabel = row[idxLabel];
-    let linkUrl = row[idxUrl];
+    const linkUrl = row[idxUrl];
     const note = row[idxNote] || '';
     const status = idxStatus !== -1 ? (row[idxStatus] || 'atualizado').toLowerCase() : 'atualizado';
-    
-    // VALIDAÇÃO DE URL
-    if (linkUrl) {
-      // Remove qualquer coisa estranha
-      linkUrl = linkUrl.replace(/^"|"$/g, '');
-      // Se não começa com http, ignora
-      if (!isValidUrl(linkUrl)) {
-        console.warn(`⚠️ URL inválida ignorada para "${game}": ${linkUrl}`);
-        continue; // Pula este link completamente
-      }
-    } else {
-      continue; // Sem URL, pula
-    }
     
     const key = game.toLowerCase();
     if (!gamesMap.has(key)) {
@@ -751,11 +720,12 @@ async function fetchSheetData() {
       });
     }
     const entry = gamesMap.get(key);
-    const isOutdated = status === 'desatualizado';
-    entry.links.push({ label: linkLabel, url: linkUrl, type: type, isOutdated: isOutdated });
-    entry.types.add(type);
-    if (isOutdated) entry.hasOutdated = true;
-    
+    if (linkLabel && linkUrl) {
+      const isOutdated = status === 'desatualizado';
+      entry.links.push({ label: linkLabel, url: linkUrl, type: type, isOutdated: isOutdated });
+      entry.types.add(type);
+      if (isOutdated) entry.hasOutdated = true;
+    }
     if (note && !entry.note) entry.note = note;
     else if (note) entry.note += ' ' + note;
   }
@@ -778,15 +748,10 @@ function buildCard(entry, idx) {
   ).join('');
   
   const linksHtml = entry.links.map(link => {
-    // Só cria o link se a URL for válida
-    if (!isValidUrl(link.url)) {
-      console.warn('Link sem URL válida:', link);
-      return '';
-    }
     const outdatedClass = link.isOutdated ? 'outdated-link' : '';
     const outdatedIcon = link.isOutdated ? '⚠️ ' : '';
     return `
-      <a class="dl-btn ${outdatedClass}" href="${link.url}" target="_blank" rel="noopener noreferrer">
+      <a class="dl-btn ${outdatedClass}" href="${link.url}" target="_blank" rel="noopener">
         <span class="icon">${outdatedIcon}${getLinkIcon(link.label)}</span>
         <span class="label">${link.label.length > 50 ? link.label.slice(0, 48) + '…' : link.label}</span>
         <span class="arrow">→</span>
@@ -815,18 +780,28 @@ function applyFilters() {
   const grid = document.getElementById('grid');
   const search = document.getElementById('search').value.toLowerCase();
   
+  console.log('Filtro atual:', currentFilter); // Debug
+  console.log('Total de cards:', allCards.length); // Debug
+  console.log('Cards com outdated:', allCards.filter(c => c.hasOutdated === true).length); // Debug
+  
   const filtered = allCards.filter(entry => {
+    // Filtro por tipo
     let typeMatch = true;
     if (currentFilter === 'all') {
       typeMatch = true;
     } else if (currentFilter === 'outdated') {
+      // Filtro especial: mostra apenas jogos com link desatualizado
       typeMatch = entry.hasOutdated === true;
+      if (typeMatch) console.log('Card incluído no filtro outdated:', entry.game); // Debug
     } else {
       typeMatch = entry.typesArray.includes(currentFilter);
     }
+    
     const searchMatch = !search || entry.game.toLowerCase().includes(search);
     return typeMatch && searchMatch;
   });
+  
+  console.log('Filtrados encontrados:', filtered.length); // Debug
   
   if (filtered.length === 0) {
     grid.innerHTML = '<div class="empty">Nenhum resultado encontrado</div>';
@@ -856,7 +831,6 @@ async function loadData() {
     </div>`;
   }
 }
-
 // ========== EVENTOS ==========
 document.querySelectorAll('.filter-btn').forEach(btn => {
   btn.addEventListener('click', () => {
