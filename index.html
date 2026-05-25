@@ -340,7 +340,7 @@
     .outdated-badge {
       position: absolute;
       bottom: 12px;
-      left: 12px;
+      right: 12px;
       background: rgba(192, 57, 43, 0.85);
       backdrop-filter: blur(4px);
       color: #fff;
@@ -831,7 +831,6 @@
         ${sources}
         <img class="card-image" src="${escapeHtml(fallback)}" alt="${escapeHtml(game)}" loading="lazy" onerror="${onError}">
       </picture>
-      ${isOutdated ? '<div class="outdated-badge">⚠️ Desatualizado</div>' : ''}
     `;
   }
 
@@ -875,6 +874,7 @@
         <div class="card-image-wrap">
           ${renderImageArea(game, hasOutdated)}
           <div class="card-badges">${renderBadges(typesArray)}</div>
+          ${hasOutdated ? '<div class="outdated-badge">⚠️ Desatualizado</div>' : ''}
         </div>
         <div class="card-body">
           <div class="card-game">${escapeHtml(game)}</div>
