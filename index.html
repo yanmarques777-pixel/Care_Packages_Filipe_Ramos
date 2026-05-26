@@ -4,24 +4,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Care Packages — Filipe Ramos</title>
-<link rel="icon" type="image/x-icon" href="assets/favicon.ico">  
+<link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
-  /* ========== ESTILO BASE ========== */
+  /* ========== VARIÁVEIS ========== */
   :root {
-    --bg: #0a0a0c;
-    --surface: #111116;
-    --surface2: #18181f;
-    --border: #2a2a35;
-    --accent: #e8ff47;
-    --accent2: #ff6b35;
-    --text: #e8e8f0;
-    --muted: #6b6b80;
-    --card-hover: #1c1c26;
-    --outdated: #c0392b;
-    --outdated-bg: rgba(192, 57, 43, 0.15);
+    --bg:          #0a0a0c;
+    --surface:     #111116;
+    --surface2:    #18181f;
+    --border:      #2a2a35;
+    --accent:      #e8ff47;
+    --accent2:     #ff6b35;
+    --text:        #e8e8f0;
+    --muted:       #6b6b80;
+    --card-hover:  #1c1c26;
+    --outdated:    #c0392b;
+    --outdated-bg: rgba(192,57,43,0.15);
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* ========== RESET ========== */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* ========== BASE ========== */
   body {
     background: var(--bg);
     color: var(--text);
@@ -29,6 +33,8 @@
     min-height: 100vh;
     cursor: crosshair;
   }
+
+  /* Grain overlay */
   body::before {
     content: '';
     position: fixed;
@@ -38,6 +44,8 @@
     pointer-events: none;
     z-index: 9999;
   }
+
+  /* ========== HEADER ========== */
   header {
     padding: 60px 40px 40px;
     border-bottom: 1px solid var(--border);
@@ -90,10 +98,15 @@
     font-size: 12px;
     color: var(--muted);
   }
-  .header-meta a:hover {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
+  .header-meta a {
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 1px dashed var(--border);
+    transition: color 0.2s, border-color 0.2s;
   }
+  .header-meta a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* Status dot animado */
   .status-dot {
     width: 7px;
     height: 7px;
@@ -101,13 +114,14 @@
     background: var(--accent);
     animation: pulse 2s infinite;
     display: inline-block;
+    flex-shrink: 0;
   }
   @keyframes pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.7); }
+    50%       { opacity: 0.4; transform: scale(0.7); }
   }
 
-  /* BLOCO DE LINKS SOCIAIS */
+  /* ========== LINKS SOCIAIS ========== */
   .official-links {
     padding: 20px 40px;
     border-bottom: 1px solid var(--border);
@@ -119,7 +133,7 @@
     font-size: 12px;
     letter-spacing: 0.5px;
   }
-  .official-links span {
+  .official-links > span {
     color: var(--accent);
     font-weight: bold;
     margin-right: 4px;
@@ -132,12 +146,10 @@
     text-decoration: none;
     transition: color 0.2s;
   }
-  .social-icon:hover {
-    color: var(--accent);
-  }
-  .social-icon i { font-style: normal; font-size: 18px; }
+  .social-icon:hover { color: var(--accent); }
+  .social-icon img { width: 18px; height: 18px; vertical-align: middle; }
 
-  /* CONTROLES */
+  /* ========== CONTROLES ========== */
   .controls {
     padding: 24px 40px;
     border-bottom: 1px solid var(--border);
@@ -152,6 +164,7 @@
     color: var(--muted);
     text-transform: uppercase;
     margin-right: 4px;
+    flex-shrink: 0;
   }
   .filter-btn {
     background: transparent;
@@ -162,17 +175,37 @@
     font-size: 11px;
     letter-spacing: 1px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
     text-transform: uppercase;
   }
-  .filter-btn:hover, .filter-btn.active {
+  .filter-btn:hover,
+  .filter-btn.active {
     border-color: var(--accent);
     color: var(--accent);
     background: rgba(232,255,71,0.05);
   }
+  .filter-btn[data-filter="outdated"] { border-color: rgba(192,57,43,0.5); }
+  .filter-btn[data-filter="outdated"]:hover,
+  .filter-btn[data-filter="outdated"].active {
+    border-color: var(--outdated);
+    color: var(--outdated);
+    background: var(--outdated-bg);
+  }
+
+  /* Campo de busca */
   .search-wrap {
     margin-left: auto;
     position: relative;
+  }
+  .search-wrap::before {
+    content: '⌕';
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 16px;
+    pointer-events: none;
   }
   .search-wrap input {
     background: var(--surface);
@@ -186,17 +219,8 @@
     transition: border-color 0.2s;
   }
   .search-wrap input:focus { border-color: var(--accent); }
-  .search-wrap::before {
-    content: '⌕';
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--muted);
-    font-size: 16px;
-  }
 
-  /* GRID E CARDS */
+  /* ========== GRID & CARDS ========== */
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
@@ -214,18 +238,10 @@
   .card:hover { background: var(--card-hover); }
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
+    to   { opacity: 1; transform: translateY(0); }
   }
-  .card-image {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    display: block;
-    filter: grayscale(20%) brightness(0.85);
-    transition: filter 0.3s;
-    background: var(--surface2);
-  }
-  .card:hover .card-image { filter: grayscale(0%) brightness(1); }
+
+  /* Imagem do card */
   .card-image-wrap {
     position: relative;
     overflow: hidden;
@@ -237,6 +253,30 @@
     background: linear-gradient(to bottom, transparent 40%, rgba(10,10,12,0.8));
     pointer-events: none;
   }
+  .card-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+    filter: grayscale(20%) brightness(0.85);
+    transition: filter 0.3s;
+    background: var(--surface2);
+  }
+  .card:hover .card-image { filter: grayscale(0%) brightness(1); }
+
+  /* Placeholder quando imagem falha */
+  .img-placeholder {
+    width: 100%;
+    height: 180px;
+    background: var(--surface2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    user-select: none;
+  }
+
+  /* Badges no topo direito */
   .card-badges {
     position: absolute;
     top: 12px;
@@ -249,7 +289,7 @@
   }
   .card-type-badge {
     background: var(--accent2);
-    color: white;
+    color: #fff;
     font-size: 9px;
     letter-spacing: 2px;
     padding: 3px 8px;
@@ -258,20 +298,20 @@
     border-radius: 2px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.3);
   }
-  .card-type-badge.modpack { background: #f1c40f; color: #111; }
-  .card-type-badge.retexture { background: #9b59b6; }
-  .card-type-badge.infographic { background: #4a90d9; }
-  .card-type-badge.map { background: #27ae60; }
-  .card-type-badge.list { background: #e67e22; }
+  .card-type-badge.modpack    { background: #f1c40f; color: #111; }
+  .card-type-badge.retexture  { background: #9b59b6; }
+  .card-type-badge.infographic{ background: #4a90d9; }
+  .card-type-badge.map        { background: #27ae60; }
+  .card-type-badge.list       { background: #e67e22; }
 
-  /* BADGE DE DESATUALIZADO (inferior) */
+  /* Badge "desatualizado" no canto inferior esquerdo */
   .outdated-badge {
     position: absolute;
     bottom: 12px;
     left: 12px;
-    background: rgba(192, 57, 43, 0.85);
+    background: rgba(192,57,43,0.85);
     backdrop-filter: blur(4px);
-    color: white;
+    color: #fff;
     font-size: 8px;
     letter-spacing: 2px;
     padding: 3px 8px;
@@ -282,21 +322,7 @@
     font-weight: bold;
   }
 
-  /* ESTILO PARA LINKS DESATUALIZADOS */
-  .dl-btn.outdated-link {
-    background: var(--outdated-bg);
-    border-color: rgba(192, 57, 43, 0.3);
-    color: var(--muted);
-  }
-  .dl-btn.outdated-link:hover {
-    border-color: var(--outdated);
-    color: var(--outdated);
-    background: rgba(192, 57, 43, 0.1);
-  }
-  .dl-btn.outdated-link .icon {
-    opacity: 0.6;
-  }
-
+  /* Corpo do card */
   .card-body {
     padding: 20px;
     flex: 1;
@@ -320,6 +346,8 @@
     font-style: italic;
   }
   .card-links { display: flex; flex-direction: column; gap: 6px; }
+
+  /* Botões de download */
   .dl-btn {
     display: flex;
     align-items: center;
@@ -332,20 +360,43 @@
     font-family: 'DM Mono', monospace;
     font-size: 11px;
     letter-spacing: 0.5px;
-    transition: all 0.15s;
-    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
   }
   .dl-btn:hover {
     border-color: var(--accent);
     color: var(--accent);
     background: rgba(232,255,71,0.06);
   }
-  .dl-btn .icon { opacity: 0.5; font-size: 13px; flex-shrink: 0; }
+  .dl-btn .icon  { opacity: 0.5; font-size: 13px; flex-shrink: 0; }
   .dl-btn:hover .icon { opacity: 1; }
-  .dl-btn .label { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .dl-btn .arrow { opacity: 0; transition: opacity 0.15s, transform 0.15s; font-size: 12px; }
+  .dl-btn .label {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .dl-btn .arrow {
+    opacity: 0;
+    transition: opacity 0.15s, transform 0.15s;
+    font-size: 12px;
+  }
   .dl-btn:hover .arrow { opacity: 1; transform: translateX(3px); }
-  .empty, .error-state {
+
+  /* Botão desatualizado */
+  .dl-btn.outdated-link {
+    background: var(--outdated-bg);
+    border-color: rgba(192,57,43,0.3);
+    color: var(--muted);
+  }
+  .dl-btn.outdated-link .icon { opacity: 0.6; }
+  .dl-btn.outdated-link:hover {
+    border-color: var(--outdated);
+    color: var(--outdated);
+    background: rgba(192,57,43,0.1);
+  }
+
+  /* ========== ESTADOS ========== */
+  .state-msg {
     grid-column: 1 / -1;
     padding: 80px;
     text-align: center;
@@ -354,18 +405,9 @@
     letter-spacing: 2px;
     text-transform: uppercase;
   }
-  .error-state { color: #ff6b6b; }
-  footer {
-    padding: 32px 40px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 1px;
-  }
-  .footer-ps { max-width: 500px; line-height: 1.7; font-style: italic; }
+  .state-msg.error { color: #ff6b6b; }
+
+  /* ========== LOADING ========== */
   #loading {
     padding: 100px 40px;
     text-align: center;
@@ -387,6 +429,26 @@
     animation: spin 0.8s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ========== FOOTER ========== */
+  footer {
+    padding: 32px 40px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    gap: 24px;
+  }
+  .footer-ps {
+    max-width: 500px;
+    line-height: 1.7;
+    font-style: italic;
+  }
+
+  /* ========== COUNT BADGE ========== */
   .count-badge {
     background: rgba(232,255,71,0.12);
     color: var(--accent);
@@ -394,23 +456,8 @@
     padding: 2px 8px;
     letter-spacing: 2px;
   }
-  .img-placeholder {
-    width: 100%;
-    height: 180px;
-    background: var(--surface2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 48px;
-    user-select: none;
-  }
 
-  /* Social icons spacing */
-  .social-icon img {
-    margin-right: 6px;
-  }
-
-  /* Botão de mute */
+  /* ========== BOTÃO MUTE ========== */
   #muteButton {
     position: fixed;
     bottom: 20px;
@@ -427,7 +474,7 @@
     align-items: center;
     justify-content: center;
     z-index: 9999;
-    transition: all 0.2s;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
     backdrop-filter: blur(4px);
   }
   #muteButton:hover {
@@ -439,41 +486,39 @@
 </head>
 <body>
 
+<!-- ========== HEADER ========== -->
 <header>
   <div class="header-tag">
-    <img src="assets/logo_vermelha.png" alt="Logo Filipe Ramos" style="height: 20px; width: auto; vertical-align: middle;">
+    <img src="assets/logo_vermelha.png" alt="Logo Filipe Ramos" style="height:20px;width:auto;vertical-align:middle;">
     by Filipe Ramos ·
   </div>
   <h1>CARE<br><span>PACKAGES</span></h1>
   <div class="header-meta">
-    <span class="status-dot"></span>
-    <a href="https://drive.google.com/file/d/1mdY9ppbrtIQSj0OjOtdSkkYu-bItLn0A/view" target="_blank" rel="noopener" style="color: var(--muted); text-decoration: none; border-bottom: 1px dashed var(--border); transition: color 0.2s;">TXT Oficial</a>
-    <span id="item-count" class="count-badge">—</span>
+    <span class="status-dot" aria-hidden="true"></span>
+    <a href="https://drive.google.com/file/d/1mdY9ppbrtIQSj0OjOtdSkkYu-bItLn0A/view" target="_blank" rel="noopener">TXT Oficial</a>
+    <span id="item-count" class="count-badge" aria-live="polite">—</span>
   </div>
 </header>
 
-<!-- BLOCO DE LINKS OFICIAIS -->
-<div class="official-links">
+<!-- ========== LINKS SOCIAIS ========== -->
+<div class="official-links" role="navigation" aria-label="Links do Filipe Ramos">
   <span>✦ FILIPE RAMOS ✦</span>
   <a class="social-icon" href="https://www.youtube.com/@FilipeRamos96" target="_blank" rel="noopener">
-    <img src="assets/logo_links/YouTube Principal.png" alt="YouTube" style="width: 18px; height: 18px; vertical-align: middle;">
-    YouTube Principal
+    <img src="assets/logo_links/YouTube Principal.png" alt="">YouTube Principal
   </a>
   <a class="social-icon" href="https://www.youtube.com/@filiperamoslives" target="_blank" rel="noopener">
-    <img src="assets/logo_links/Baú de Lives.png" alt="Baú de Lives" style="width: 18px; height: 18px; vertical-align: middle;">
-    Baú de Lives
+    <img src="assets/logo_links/Baú de Lives.png" alt="">Baú de Lives
   </a>
   <a class="social-icon" href="https://m.twitch.tv/filiperaaamos/home" target="_blank" rel="noopener">
-    <img src="assets/logo_links/Twitch.png" alt="Twitch" style="width: 18px; height: 18px; vertical-align: middle;">
-    Twitch
+    <img src="assets/logo_links/Twitch.png" alt="">Twitch
   </a>
   <a class="social-icon" href="https://open.spotify.com/playlist/5Q9yMHVWaUhqxtttPsZVqA?si=a08e531e826f413c" target="_blank" rel="noopener">
-    <img src="assets/logo_links/Playlist Spotify.png" alt="Spotify" style="width: 18px; height: 18px; vertical-align: middle;">
-    Playlist Spotify
+    <img src="assets/logo_links/Playlist Spotify.png" alt="">Playlist Spotify
   </a>
 </div>
 
-<div class="controls">
+<!-- ========== CONTROLES ========== -->
+<div class="controls" role="toolbar" aria-label="Filtros">
   <span class="filter-label">Filtrar:</span>
   <button class="filter-btn active" data-filter="all">Todos</button>
   <button class="filter-btn" data-filter="modpack">Modpacks</button>
@@ -481,130 +526,102 @@
   <button class="filter-btn" data-filter="infographic">Infográficos</button>
   <button class="filter-btn" data-filter="map">Mapas</button>
   <button class="filter-btn" data-filter="list">Listas</button>
-  <button class="filter-btn" data-filter="outdated" style="border-color: rgba(192,57,43,0.5);">⚠️ Desatualizados</button>
+  <button class="filter-btn" data-filter="outdated">⚠️ Desatualizados</button>
   <div class="search-wrap">
-    <input type="text" id="search" placeholder="Buscar jogo...">
+    <label for="search" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">Buscar jogo</label>
+    <input type="search" id="search" placeholder="Buscar jogo..." autocomplete="off">
   </div>
 </div>
 
-<div id="loading">
-  <div class="loader"></div>
+<!-- ========== CONTEÚDO ========== -->
+<div id="loading" aria-live="polite">
+  <div class="loader" role="status" aria-label="Carregando"></div>
   Carregando care packages...
 </div>
+<div class="grid" id="grid" style="display:none" role="list"></div>
 
-<div class="grid" id="grid" style="display:none"></div>
-
+<!-- ========== FOOTER ========== -->
 <footer>
-  <div class="footer-ps" id="footer-ps">PS: Essa lista é temporária e pode ter packs desatualizados, a ideia era só ter um lugar pra centralizar tudo q eu já deixei pra download pelas lives ao longo dos anos.</div>
+  <p class="footer-ps">PS: Essa lista é temporária e pode ter packs desatualizados, a ideia era só ter um lugar pra centralizar tudo q eu já deixei pra download pelas lives ao longo dos anos.</p>
   <div>Made by Yan Marques — just a fan.</div>
 </footer>
 
-<!-- SISTEMA DE MÚSICA DE FUNDO -->
-<audio id="introMusic" src="assets/music/intro.opus" preload="auto"></audio>
+<!-- ========== ÁUDIO ========== -->
+<audio id="introMusic"   src="assets/music/intro.opus"              preload="auto"></audio>
 <audio id="ambientMusic" src="assets/music/musica_ambiente_01.opus" preload="auto" loop></audio>
 
-<button id="muteButton">🔊</button>
+<button id="muteButton" aria-label="Alternar música" aria-pressed="false">🔊</button>
 
 <script>
-// ============================================================
-// SISTEMA DE MÚSICA
-// ============================================================
-const intro = document.getElementById('introMusic');
-const ambient = document.getElementById('ambientMusic');
-const muteBtn = document.getElementById('muteButton');
-let isMuted = false;
-let introStarted = false;
+'use strict';
 
-intro.volume = 0.6;
-ambient.volume = 0.4;
-
-intro.addEventListener('ended', () => {
-  if (!isMuted) {
-    ambient.play().catch(e => console.log('Autoplay bloqueado:', e));
-  }
-});
-
-muteBtn.addEventListener('click', () => {
-  isMuted = !isMuted;
-  if (isMuted) {
-    intro.pause();
-    ambient.pause();
-    muteBtn.innerHTML = '🔇';
-    muteBtn.style.borderColor = 'var(--accent2)';
-  } else {
-    if (intro.currentTime < intro.duration && !intro.ended) {
-      intro.play().catch(e => console.log('Play bloqueado:', e));
-    } else if (ambient.currentTime > 0 || intro.ended) {
-      ambient.play().catch(e => console.log('Play bloqueado:', e));
-    }
-    muteBtn.innerHTML = '🔊';
-    muteBtn.style.borderColor = 'var(--border)';
-  }
-});
-
-function startMusic() {
-  if (introStarted) return;
-  introStarted = true;
-  if (!isMuted) {
-    intro.play().catch(e => {
-      console.log('Autoplay bloqueado, aguardando interação:', e);
-      document.body.addEventListener('click', startMusic, { once: true });
-    });
-  }
-}
-
-document.body.addEventListener('click', startMusic, { once: true });
-window.addEventListener('scroll', startMusic, { once: true });
-window.addEventListener('keydown', startMusic, { once: true });
-
-// ============================================================
-// CONFIGURAÇÃO - URL DO GOOGLE SHEETS CSV (PUBLICADO)
-// ============================================================
-const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnzg_Kx3G6lfQsUzCaGv2r-sA-quEirYw4YFgNF-Y5ibgYwcVM3Cb9XywtNrVgK9G9C3RThSoMmJUf/pub?output=csv';
-
-// Caminho das imagens (locais)
-const IMAGES_BASE_PATH = 'assets/images/';
-const IMAGE_EXTENSIONS = ['avif', 'jpg'];
-
-// Mapeamento de nomes de jogos para slugs de imagem
-const IMAGE_FILENAME_MAP = {
-  "Need for Speed Most Wanted": "need-for-speed-most-wanted",
-  "Bloodborne": "bloodborne",
-  "Dark Souls": "dark-souls",
-  "Need for Speed Underground 2": "need-for-speed-underground-2",
-  "Beat Down: Fists of Vengeance": "beat-down-fists-of-vengeance",
-  "God Hand": "god-hand",
-  "Fallout New Vegas": "fallout-new-vegas",
-  "S.T.A.L.K.E.R Call of Pripyat": "stalker-call-of-pripyat",
-  "S.T.A.L.K.E.R Clear Sky": "stalker-clear-sky",
-  "S.T.A.L.K.E.R Call of Chernobyl": "stalker-call-of-chernobyl",
-  "Borderlands 3": "borderlands-3",
-  "Yu-Gi-Oh! Forbidden Memories": "yugioh-forbidden-memories",
-  "Yu-Gi-Oh! GX Tag Force": "yugioh-gx-tag-force",
-  "Yu-Gi-Oh! Capsule Monster Coliseum": "yugioh-capsule-monster-coliseum",
-  "Final Fantasy XII": "final-fantasy-xii",
-  "Fallout 2": "fallout-2",
-  "Gran Turismo 4": "gran-turismo-4",
-  "Monster Hunter World": "monster-hunter-world",
-  "Resident Evil 5": "resident-evil-5",
-  "RE Revelations 2": "re-revelations-2",
-  "GTA IV": "gta-iv",
-  "Deadly Premonition": "deadly-premonition",
-  "NFS 2015": "nfs-2015",
-  "GTA SA": "gta-sa",
-  "Sons of the Forest": "sons-of-the-forest",
-  "RE4 Remake": "re4-remake"
+/* ============================================================
+   CONFIGURAÇÃO
+   ============================================================ */
+const CONFIG = {
+  csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnzg_Kx3G6lfQsUzCaGv2r-sA-quEirYw4YFgNF-Y5ibgYwcVM3Cb9XywtNrVgK9G9C3RThSoMmJUf/pub?output=csv',
+  imagesPath: 'assets/images/',
+  imageExts: ['avif', 'jpg'],
 };
 
-// ========== FUNÇÕES AUXILIARES ==========
-function getImageBaseFilename(gameName) {
-  for (const [key, filename] of Object.entries(IMAGE_FILENAME_MAP)) {
-    if (gameName.toLowerCase() === key.toLowerCase()) return filename;
+/** Mapeamento game name → slug de imagem */
+const IMAGE_SLUG_MAP = {
+  'Need for Speed Most Wanted':        'need-for-speed-most-wanted',
+  'Bloodborne':                        'bloodborne',
+  'Dark Souls':                        'dark-souls',
+  'Need for Speed Underground 2':      'need-for-speed-underground-2',
+  'Beat Down: Fists of Vengeance':     'beat-down-fists-of-vengeance',
+  'God Hand':                          'god-hand',
+  'Fallout New Vegas':                 'fallout-new-vegas',
+  'S.T.A.L.K.E.R Call of Pripyat':    'stalker-call-of-pripyat',
+  'S.T.A.L.K.E.R Clear Sky':          'stalker-clear-sky',
+  'S.T.A.L.K.E.R Call of Chernobyl':  'stalker-call-of-chernobyl',
+  'Borderlands 3':                     'borderlands-3',
+  'Yu-Gi-Oh! Forbidden Memories':      'yugioh-forbidden-memories',
+  'Yu-Gi-Oh! GX Tag Force':            'yugioh-gx-tag-force',
+  'Yu-Gi-Oh! Capsule Monster Coliseum':'yugioh-capsule-monster-coliseum',
+  'Final Fantasy XII':                 'final-fantasy-xii',
+  'Fallout 2':                         'fallout-2',
+  'Gran Turismo 4':                    'gran-turismo-4',
+  'Monster Hunter World':              'monster-hunter-world',
+  'Resident Evil 5':                   'resident-evil-5',
+  'RE Revelations 2':                  're-revelations-2',
+  'GTA IV':                            'gta-iv',
+  'Deadly Premonition':                'deadly-premonition',
+  'NFS 2015':                          'nfs-2015',
+  'GTA SA':                            'gta-sa',
+  'Sons of the Forest':                'sons-of-the-forest',
+  'RE4 Remake':                        're4-remake',
+};
+
+/** Rótulos de tipo */
+const TYPE_LABELS = {
+  modpack:     'Modpack',
+  retexture:   'Retextura',
+  infographic: 'Infográfico',
+  map:         'Mapa',
+  list:        'Lista',
+};
+
+/* ============================================================
+   HELPERS PUROS
+   ============================================================ */
+
+/** Escapa HTML básico */
+function escHtml(str) {
+  return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/** Converte nome de jogo em slug de imagem */
+function gameToSlug(name) {
+  const lower = name.toLowerCase();
+  for (const [key, slug] of Object.entries(IMAGE_SLUG_MAP)) {
+    if (lower === key.toLowerCase()) return slug;
   }
-  for (const [key, filename] of Object.entries(IMAGE_FILENAME_MAP)) {
-    if (gameName.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(gameName.toLowerCase())) return filename;
+  for (const [key, slug] of Object.entries(IMAGE_SLUG_MAP)) {
+    if (lower.includes(key.toLowerCase()) || key.toLowerCase().includes(lower)) return slug;
   }
-  return gameName.toLowerCase()
+  return name.toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^\w\s-]/g, '')
     .replace(/\s+/g, '-')
@@ -612,237 +629,329 @@ function getImageBaseFilename(gameName) {
     .replace(/^-|-$/g, '');
 }
 
-function getPictureHtml(gameName, emoji, isOutdated) {
-  const baseFilename = getImageBaseFilename(gameName);
-  const sourcesHtml = IMAGE_EXTENSIONS.map(ext => {
-    const mime = ext === 'avif' ? 'image/avif' : 'image/jpeg';
-    return `<source srcset="${IMAGES_BASE_PATH}${baseFilename}.${ext}" type="${mime}">`;
-  }).join('');
-  const fallbackSrc = `${IMAGES_BASE_PATH}${baseFilename}.${IMAGE_EXTENSIONS[IMAGE_EXTENSIONS.length-1]}`;
-  
-  // Adiciona badge de desatualizado se necessário
-  const outdatedBadgeHtml = isOutdated ? '<div class="outdated-badge">⚠️ DESATUALIZADO</div>' : '';
-  
-  return `
-    <picture>
-      ${sourcesHtml}
-      <img class="card-image" src="${fallbackSrc}" alt="${gameName}" loading="lazy"
-           onerror="this.onerror=null; this.parentNode.parentNode.innerHTML='<div class=\\'img-placeholder\\'>${emoji}</div>';">
-    </picture>
-    ${outdatedBadgeHtml}
-  `;
-}
-
-function getGameEmoji(game) {
-  const l = game.toLowerCase();
-  if (l.includes('need for speed') || l.includes('gran turismo') || l.includes('nfs')) return '🏎️';
-  if (l.includes('bloodborne') || l.includes('dark souls')) return '⚔️';
-  if (l.includes('stalker')) return '☢️';
-  if (l.includes('fallout')) return '☢️';
-  if (l.includes('yu-gi-oh') || l.includes('yugioh')) return '🃏';
-  if (l.includes('gta') || l.includes('beat down')) return '🔫';
-  if (l.includes('monster hunter')) return '🐉';
-  if (l.includes('resident evil') || l.includes('deadly premonition')) return '🧟';
-  if (l.includes('final fantasy')) return '⚗️';
-  if (l.includes('god hand')) return '👊';
-  if (l.includes('sons of the forest')) return '🌲';
-  if (l.includes('borderlands')) return '🎯';
+/** Emoji representativo por gênero */
+function gameEmoji(name) {
+  const l = name.toLowerCase();
+  if (/need for speed|gran turismo|nfs/.test(l)) return '🏎️';
+  if (/bloodborne|dark souls/.test(l))            return '⚔️';
+  if (/stalker/.test(l))                          return '☢️';
+  if (/fallout/.test(l))                          return '☢️';
+  if (/yu-?gi-?oh|yugioh/.test(l))               return '🃏';
+  if (/gta|beat down/.test(l))                    return '🔫';
+  if (/monster hunter/.test(l))                   return '🐉';
+  if (/resident evil|deadly premonition/.test(l)) return '🧟';
+  if (/final fantasy/.test(l))                    return '⚗️';
+  if (/god hand/.test(l))                         return '👊';
+  if (/sons of the forest/.test(l))               return '🌲';
+  if (/borderlands/.test(l))                      return '🎯';
   return '🎮';
 }
 
-function getTypeLabel(type) {
-  const map = { modpack: 'Modpack', retexture: 'Retextura', infographic: 'Infográfico', map: 'Mapa', list: 'Lista' };
-  return map[type] || 'Pack';
-}
-
-function getLinkIcon(label) {
+/** Ícone por tipo de link */
+function linkIcon(label) {
   const l = label.toLowerCase();
-  if (l.includes('emulador')) return '🖥️';
-  if (l.includes('retextura') || l.includes('textur')) return '🎨';
+  if (l.includes('emulador'))                         return '🖥️';
+  if (l.includes('retextura') || l.includes('textur'))return '🎨';
   if (l.includes('infográfico') || l.includes('infografico') || l.includes('tabela')) return '📊';
-  if (l.includes('cheat')) return '🎯';
-  if (l.includes('ptbr')) return '🇧🇷';
-  if (l.includes('eng')) return '🇺🇸';
-  if (l.includes('mapa') || l.includes('.psd')) return '🗺️';
-  if (l.includes('lista')) return '📋';
-  if (l.startsWith('yt') || l.includes('youtube')) return '▶️';
+  if (l.includes('cheat'))                            return '🎯';
+  if (l.includes('ptbr'))                             return '🇧🇷';
+  if (l.includes('eng'))                              return '🇺🇸';
+  if (l.includes('mapa') || l.includes('.psd'))       return '🗺️';
+  if (l.includes('lista'))                            return '📋';
+  if (l.startsWith('yt') || l.includes('youtube'))    return '▶️';
   return '⬇️';
 }
 
-function escapeHtml(str) {
-  return str.replace(/[&<>]/g, function(m) {
-    if (m === '&') return '&amp;';
-    if (m === '<') return '&lt;';
-    if (m === '>') return '&gt;';
-    return m;
-  });
+/* ============================================================
+   CSV PARSER (RFC 4180 simplificado — suporta campos com vírgula entre aspas)
+   ============================================================ */
+
+/**
+ * Divide uma linha CSV respeitando campos entre aspas duplas.
+ * @param {string} line
+ * @returns {string[]}
+ */
+function parseCsvLine(line) {
+  const fields = [];
+  let cur = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (inQuotes) {
+      if (ch === '"' && line[i + 1] === '"') { cur += '"'; i++; } // aspas escapadas
+      else if (ch === '"')                    inQuotes = false;
+      else                                    cur += ch;
+    } else {
+      if      (ch === '"') inQuotes = true;
+      else if (ch === ',') { fields.push(cur.trim()); cur = ''; }
+      else                  cur += ch;
+    }
+  }
+  fields.push(cur.trim());
+  return fields;
 }
 
-// ========== PROCESSAR CSV (COM STATUS) ==========
-async function fetchSheetData() {
-  const response = await fetch(GOOGLE_SHEETS_CSV_URL);
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  const csvText = await response.text();
+/**
+ * Converte texto CSV em array de objetos {game, typesArray, links, note, hasOutdated}.
+ */
+function parseCsv(csvText) {
   const lines = csvText.split(/\r?\n/);
-  const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-  
-  const idxGame = headers.indexOf('game');
-  const idxType = headers.indexOf('type');
-  const idxLabel = headers.indexOf('link_label');
-  const idxUrl = headers.indexOf('link_url');
-  const idxNote = headers.indexOf('note');
-  const idxStatus = headers.indexOf('status');
-  
-  if (idxGame === -1 || idxType === -1 || idxLabel === -1 || idxUrl === -1) {
-    throw new Error('Colunas obrigatórias não encontradas');
+  if (!lines.length) return [];
+
+  const headers = parseCsvLine(lines[0]).map(h => h.toLowerCase());
+  const col = name => headers.indexOf(name);
+
+  const IDX = {
+    game:   col('game'),
+    type:   col('type'),
+    label:  col('link_label'),
+    url:    col('link_url'),
+    note:   col('note'),
+    status: col('status'),
+  };
+
+  if (IDX.game === -1 || IDX.type === -1 || IDX.label === -1 || IDX.url === -1) {
+    throw new Error('Colunas obrigatórias não encontradas: game, type, link_label, link_url');
   }
-  
+
   const gamesMap = new Map();
-  
+
   for (let i = 1; i < lines.length; i++) {
     if (!lines[i].trim()) continue;
-    const row = lines[i].split(',').map(cell => cell.trim().replace(/^"|"$/g, ''));
-    const game = row[idxGame];
+
+    const row       = parseCsvLine(lines[i]);
+    const game      = row[IDX.game]   || '';
+    const type      = (row[IDX.type]  || 'modpack').toLowerCase();
+    const label     = row[IDX.label]  || '';
+    const url       = row[IDX.url]    || '';
+    const note      = IDX.note   !== -1 ? (row[IDX.note]   || '') : '';
+    const status    = IDX.status !== -1 ? (row[IDX.status] || 'atualizado').toLowerCase() : 'atualizado';
+
     if (!game) continue;
-    const type = (row[idxType] || 'modpack').toLowerCase();
-    const linkLabel = row[idxLabel];
-    const linkUrl = row[idxUrl];
-    const note = row[idxNote] || '';
-    const status = idxStatus !== -1 ? (row[idxStatus] || 'atualizado').toLowerCase() : 'atualizado';
-    
+
     const key = game.toLowerCase();
     if (!gamesMap.has(key)) {
-      gamesMap.set(key, {
-        game: game,
-        types: new Set(),
-        links: [],
-        note: '',
-        hasOutdated: false
-      });
+      gamesMap.set(key, { game, types: new Set(), links: [], note: '', hasOutdated: false });
     }
+
     const entry = gamesMap.get(key);
-    if (linkLabel && linkUrl) {
+
+    if (label && url) {
       const isOutdated = status === 'desatualizado';
-      entry.links.push({ label: linkLabel, url: linkUrl, type: type, isOutdated: isOutdated });
+      entry.links.push({ label, url, type, isOutdated });
       entry.types.add(type);
       if (isOutdated) entry.hasOutdated = true;
     }
-    if (note && !entry.note) entry.note = note;
-    else if (note) entry.note += ' ' + note;
+
+    if (note) {
+      entry.note = entry.note ? `${entry.note} ${note}` : note;
+    }
   }
-  
-  return Array.from(gamesMap.values()).map(entry => ({
-    ...entry,
-    typesArray: Array.from(entry.types)
-  }));
+
+  return Array.from(gamesMap.values()).map(e => ({ ...e, typesArray: [...e.types] }));
 }
 
-// ========== RENDERIZAÇÃO ==========
-let allCards = [];
-let currentFilter = 'all';
+/* ============================================================
+   RENDERIZAÇÃO DE CARDS
+   ============================================================ */
 
-function buildCard(entry, idx) {
-  const emoji = getGameEmoji(entry.game);
-  const imageHtml = getPictureHtml(entry.game, emoji, entry.hasOutdated);
-  const badgesHtml = entry.typesArray.map(type => 
-    `<span class="card-type-badge ${type}">${getTypeLabel(type)}</span>`
-  ).join('');
-  
-  const linksHtml = entry.links.map(link => {
-    const outdatedClass = link.isOutdated ? 'outdated-link' : '';
-    const outdatedIcon = link.isOutdated ? '⚠️ ' : '';
+function buildCardHtml(entry, idx) {
+  const emoji = gameEmoji(entry.game);
+  const slug  = gameToSlug(entry.game);
+
+  // <picture> com fallback
+  const sources = CONFIG.imageExts
+    .map(ext => `<source srcset="${CONFIG.imagesPath}${slug}.${ext}" type="${ext === 'avif' ? 'image/avif' : 'image/jpeg'}">`)
+    .join('');
+  const fallbackSrc = `${CONFIG.imagesPath}${slug}.${CONFIG.imageExts.at(-1)}`;
+  const imgAlt = escHtml(entry.game);
+  // onerror apaga o <picture> inteiro e insere placeholder
+  const pictureHtml = `
+    <picture>
+      ${sources}
+      <img class="card-image" src="${fallbackSrc}" alt="${imgAlt}" loading="lazy"
+           onerror="this.closest('picture').outerHTML='<div class=\\'img-placeholder\\'>${emoji}</div>'">
+    </picture>`;
+
+  const outdatedBadge = entry.hasOutdated
+    ? '<div class="outdated-badge" aria-label="Pack desatualizado">⚠️ DESATUALIZADO</div>' : '';
+
+  const badges = entry.typesArray
+    .map(t => `<span class="card-type-badge ${escHtml(t)}">${escHtml(TYPE_LABELS[t] || t)}</span>`)
+    .join('');
+
+  const note = entry.note
+    ? `<p class="card-note">${escHtml(entry.note.slice(0, 120))}${entry.note.length > 120 ? '…' : ''}</p>` : '';
+
+  const links = entry.links.map(link => {
+    const outdatedClass = link.isOutdated ? ' outdated-link' : '';
+    const outdatedPrefix = link.isOutdated ? '⚠️ ' : '';
+    const safeLabel = escHtml(link.label.length > 50 ? link.label.slice(0, 48) + '…' : link.label);
     return `
-      <a class="dl-btn ${outdatedClass}" href="${link.url}" target="_blank" rel="noopener">
-        <span class="icon">${outdatedIcon}${getLinkIcon(link.label)}</span>
-        <span class="label">${link.label.length > 50 ? link.label.slice(0, 48) + '…' : link.label}</span>
-        <span class="arrow">→</span>
-      </a>
-    `;
+      <a class="dl-btn${outdatedClass}" href="${escHtml(link.url)}" target="_blank" rel="noopener noreferrer"
+         aria-label="${escHtml(link.label)}${link.isOutdated ? ' (desatualizado)' : ''}">
+        <span class="icon" aria-hidden="true">${outdatedPrefix}${linkIcon(link.label)}</span>
+        <span class="label">${safeLabel}</span>
+        <span class="arrow" aria-hidden="true">→</span>
+      </a>`;
   }).join('');
-  
-  const noteHtml = entry.note ? `<p class="card-note">${escapeHtml(entry.note.slice(0, 120))}${entry.note.length > 120 ? '…' : ''}</p>` : '';
-  
+
   return `
-    <div class="card" style="animation-delay:${idx * 40}ms" data-types="${entry.typesArray.join(',')}" data-game="${entry.game.toLowerCase()}">
+    <article class="card" role="listitem" style="animation-delay:${idx * 40}ms"
+             data-types="${entry.typesArray.join(',')}"
+             data-game="${escHtml(entry.game.toLowerCase())}">
       <div class="card-image-wrap">
-        ${imageHtml}
-        <div class="card-badges">${badgesHtml}</div>
+        ${pictureHtml}
+        ${outdatedBadge}
+        <div class="card-badges" aria-hidden="true">${badges}</div>
       </div>
       <div class="card-body">
-        <div class="card-game">${escapeHtml(entry.game)}</div>
-        ${noteHtml}
-        <div class="card-links">${linksHtml}</div>
+        <h2 class="card-game">${escHtml(entry.game)}</h2>
+        ${note}
+        <div class="card-links">${links}</div>
       </div>
-    </div>
-  `;
+    </article>`;
 }
 
+/* ============================================================
+   FILTRO & BUSCA
+   ============================================================ */
+
+let allEntries    = [];
+let currentFilter = 'all';
+
 function applyFilters() {
-  const grid = document.getElementById('grid');
-  const search = document.getElementById('search').value.toLowerCase();
-  
-  console.log('Filtro atual:', currentFilter); // Debug
-  console.log('Total de cards:', allCards.length); // Debug
-  console.log('Cards com outdated:', allCards.filter(c => c.hasOutdated === true).length); // Debug
-  
-  const filtered = allCards.filter(entry => {
-    // Filtro por tipo
-    let typeMatch = true;
-    if (currentFilter === 'all') {
-      typeMatch = true;
-    } else if (currentFilter === 'outdated') {
-      // Filtro especial: mostra apenas jogos com link desatualizado
-      typeMatch = entry.hasOutdated === true;
-      if (typeMatch) console.log('Card incluído no filtro outdated:', entry.game); // Debug
-    } else {
-      typeMatch = entry.typesArray.includes(currentFilter);
-    }
-    
+  const grid   = document.getElementById('grid');
+  const search = document.getElementById('search').value.toLowerCase().trim();
+
+  const filtered = allEntries.filter(entry => {
+    const typeMatch =
+      currentFilter === 'all'      ? true :
+      currentFilter === 'outdated' ? entry.hasOutdated :
+      entry.typesArray.includes(currentFilter);
+
     const searchMatch = !search || entry.game.toLowerCase().includes(search);
     return typeMatch && searchMatch;
   });
-  
-  console.log('Filtrados encontrados:', filtered.length); // Debug
-  
+
   if (filtered.length === 0) {
-    grid.innerHTML = '<div class="empty">Nenhum resultado encontrado</div>';
-    return;
+    grid.innerHTML = '<div class="state-msg">Nenhum resultado encontrado</div>';
+  } else {
+    grid.innerHTML = filtered.map((e, i) => buildCardHtml(e, i)).join('');
   }
-  grid.innerHTML = filtered.map((e, i) => buildCard(e, i)).join('');
 }
 
-// ========== CARREGAR DADOS ==========
+/* ============================================================
+   CARREGAMENTO DE DADOS
+   ============================================================ */
+
 async function loadData() {
-  const loadingDiv = document.getElementById('loading');
-  const gridDiv = document.getElementById('grid');
+  const loadingEl = document.getElementById('loading');
+  const gridEl    = document.getElementById('grid');
+
   try {
-    const games = await fetchSheetData();
-    allCards = games;
-    document.getElementById('item-count').textContent = `${games.length} games`;
-    loadingDiv.style.display = 'none';
-    gridDiv.style.display = 'grid';
+    const res = await fetch(CONFIG.csvUrl);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const csv = await res.text();
+    allEntries = parseCsv(csv);
+
+    document.getElementById('item-count').textContent = `${allEntries.length} games`;
+    loadingEl.style.display = 'none';
+    gridEl.style.display    = 'grid';
     applyFilters();
+
   } catch (err) {
-    console.error(err);
-    loadingDiv.style.display = 'none';
-    gridDiv.style.display = 'grid';
-    gridDiv.innerHTML = `<div class="empty error-state">
-      ⚠️ Erro ao carregar dados do Google Sheets.<br>
-      Verifique se a URL do CSV está correta e se a planilha está publicada.
-    </div>`;
+    console.error('[Care Packages] Falha ao carregar dados:', err);
+    loadingEl.style.display = 'none';
+    gridEl.style.display    = 'grid';
+    gridEl.innerHTML = `
+      <div class="state-msg error">
+        ⚠️ Erro ao carregar dados do Google Sheets.<br>
+        Verifique se a URL do CSV está correta e se a planilha está publicada.
+      </div>`;
   }
 }
-// ========== EVENTOS ==========
+
+/* ============================================================
+   EVENTOS — FILTROS & BUSCA
+   ============================================================ */
+
 document.querySelectorAll('.filter-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.filter-btn').forEach(b => {
+      b.classList.remove('active');
+      b.removeAttribute('aria-current');
+    });
     btn.classList.add('active');
+    btn.setAttribute('aria-current', 'true');
     currentFilter = btn.dataset.filter;
     applyFilters();
   });
 });
+
 document.getElementById('search').addEventListener('input', applyFilters);
 
+/* ============================================================
+   MÚSICA DE FUNDO
+   ============================================================ */
+
+(function initMusic() {
+  const intro   = document.getElementById('introMusic');
+  const ambient = document.getElementById('ambientMusic');
+  const muteBtn = document.getElementById('muteButton');
+
+  intro.volume   = 0.6;
+  ambient.volume = 0.4;
+
+  let muted       = false;
+  let attempted   = false;
+
+  /** Tenta iniciar a intro (chamado na primeira interação) */
+  function startIntro() {
+    if (attempted) return;
+    attempted = true;
+    if (!muted) {
+      intro.play().catch(() => {/* autoplay bloqueado pelo browser */});
+    }
+  }
+
+  /** Quando a intro termina, inicia o ambient (se não mutado) */
+  intro.addEventListener('ended', () => {
+    if (!muted) ambient.play().catch(() => {});
+  });
+
+  /** Botão mute/unmute */
+  muteBtn.addEventListener('click', () => {
+    muted = !muted;
+    muteBtn.setAttribute('aria-pressed', String(muted));
+
+    if (muted) {
+      intro.pause();
+      ambient.pause();
+      muteBtn.textContent = '🔇';
+      muteBtn.style.borderColor = 'var(--accent2)';
+    } else {
+      muteBtn.textContent = '🔊';
+      muteBtn.style.borderColor = 'var(--border)';
+      // Retoma de onde parou
+      if (!intro.ended && intro.currentTime > 0) {
+        intro.play().catch(() => {});
+      } else if (intro.ended || intro.currentTime === 0) {
+        ambient.play().catch(() => {});
+      }
+    }
+  });
+
+  // Inicia música na primeira interação do usuário
+  ['click','scroll','keydown'].forEach(evt =>
+    window.addEventListener(evt, startIntro, { once: true, passive: true })
+  );
+})();
+
+/* ============================================================
+   INIT
+   ============================================================ */
 loadData();
 </script>
 </body>
